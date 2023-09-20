@@ -8,13 +8,9 @@ elaborar la respuesta correcta:
 a) La ocurrencia de una excepción en un procesador causa que la ejecución secuencial
 del código se vea interrumpida necesariamente.
 
-V (verdadero) - La ocurrencia de una excepción en un procesador 
-interrumpe la ejecución secuencial del código en curso para manejar
- la excepción correspondiente. El procesador realiza un salto a una
- rutina de manejo de excepciones, que se encarga de manejar 
- la situación excepcional. Una vez que se maneja la excepción, 
- la ejecución puede reanudarse desde el punto en el que se interrumpió 
- o seguir una lógica específica de manejo de excepciones.
+F (falso)
+
+Explicación: La ocurrencia de una excepción en un procesador no necesariamente interrumpe la ejecución secuencial del código de forma inmediata. La forma en que se maneja la excepción depende de la arquitectura y el diseño específico del procesador, pudiendo involucrar saltos a rutinas de manejo de excepciones (ISR) o incluso continuar con la ejecución en ciertos casos según la lógica de manejo de excepciones implementada. Por lo tanto, no siempre se interrumpe necesariamente la ejecución secuencial del código en curso al ocurrir una excepción.
 
 ///////////////////////// 
  
@@ -22,7 +18,7 @@ b) La diferencia entre un evento de interrupción y de excepción es que la prim
 causada por un recurso del procesador, mientras que la segunda se trata de un
 evento proveniente de un controlador de E/S externo.
 
-Falso. Tanto interrupciones como excepciones pueden ser internas o externas.
+Falso.Es al reves, ademas Tanto interrupciones como excepciones pueden ser internas o externas.
 
 //////////////////////////////////////////////
 
@@ -40,11 +36,7 @@ d) La dirección donde se aloja la ISR (vector de interrupciones) es fija sólo 
 posee solo un módulo de E/S que genera interrupción.
 
 
-V (Verdadero). En sistemas con un único módulo de E/S generando 
-interrupciones, la dirección de la ISR puede ser fija. 
-Sin embargo, en sistemas más complejos con múltiples fuentes 
-de interrupción, suele haber una tabla de vectores de interrupción 
-para determinar las direcciones correctas de las ISRs.
+falsa porque depende del manejo de excepciones que tenga el micro
 
 ////////////////////////////////////////////
 
@@ -76,13 +68,10 @@ procesador puede retrasar su ejecución si tiene eventos de mayor prioridad
 pendientes.
 
 
-F (Falso). Que una fuente de interrupción externa sea "enmascarable"
- significa que el procesador puede decidir si atender o no 
- la interrupción, posiblemente basándose en su prioridad. 
- Sin embargo, no implica que el procesador pueda retrasar 
- la ejecución de la interrupción si tiene eventos de mayor prioridad 
- pendientes. Al contrario, una interrupción enmascarable puede ser
- postergada o ignorada si hay eventos de mayor prioridad ocurriendo.
+
+V (verdadero)
+
+Cuando una fuente de interrupción externa es "enmascarable", significa que el procesador tiene la capacidad de deshabilitar temporalmente la interrupción proveniente de esa fuente. Si hay otras interrupciones con mayor prioridad pendientes, el procesador puede retrasar la ejecución de la interrupción enmascarable hasta que maneje las interrupciones de mayor prioridad. Esto permite al procesador priorizar y gestionar de manera adecuada las interrupciones según su importancia y relevancia en un sistema.
 
 
 
@@ -94,7 +83,8 @@ Counter) al momento de la excepción más cuatro (PC excepción + 4).
 V (Verdadero). La instrucción ERET (Exception Return) retorna 
 el Program Counter (PC) al valor que tenía al momento de 
 la excepción más cuatro, permitiendo regresar a la secuencia 
-de instrucciones interrumpida.
+de instrucciones interrumpida. Excepto que sea una salto, si es asi, debe volver al
+lugar del salto
 
 
 */

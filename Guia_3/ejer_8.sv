@@ -13,28 +13,45 @@ forzar la ejecución de este nuevo OpCode.
 - Cualquier otra fuente de excepción el procesador debe quedar atrapado en un lazo
 infinito dentro del vector de excepciones.
 
+/*
+
+exc_vector: 	mrs x9, ____________
+		subis xzr, x9, ____
+		b.ne jmp1
+question1: 	____ isr_proc
+		eret
+jmp1: 		subis xzr, ____, 0x02
+		b.ne exc_trap
+		movz x9, _______, lsl #16
+		movk x9, #0x03FF, lsl #0
+		mrs ___, s2_0_c1_c0_0
+		sturw ___,[x10, #0]
+		____ x10
+exc_trap: 	b exc_trap
+
 */
+
+
 
 /***********************Punto 1*********************************
 */
 
 /*
 
-exc_vector: mrs x9, S3_0_C5_C0_0   ; Leer el registro de estado de excepción (ESR)
-            subis xzr, x9, #0x08     ; Comprobar si es una excepción de interrupción externa (IRQ)
-            b.ne jmp1                ; Saltar si no es una excepción de interrupción externa
-question1:  b isr_proc    ; Llamar a la rutina de servicio de interrupción (ISR)
-            eret
+exc_vector: 	mrs x9, S2_0_C2_C0_0
+		subis xzr, x9, #0x01
+                b.ne jmp1
+question1:  	b isr_proc
+                eret
+jmp1: 		subis xzr, x9, 0x02
+                b.ne exc_trap
+	        movz x9, #0x8B1F, lsl #16
+		movk x9, #0x03FF, lsl #0
+	        mrs x10, s2_0_c1_c0_0
+		sturw x9,[x10, #0]
+		br x10
+exc_trap: 	b exc_trap
 
-jmp1:       subis xzr, x9, 0x02     ; Comprobar si es una excepción por OpCode inválido
-            b.ne exc_trap           ; Saltar si no es una excepción por OpCode inválido
-            movz x9, #0x8B1F, lsl #16 ; Cargar el nuevo OpCode inválido
-            movk x9, #0x03FF, lsl #0
-            mrs x10, S3_0_C0_C0_0     ; Leer la dirección de memoria de la instrucción corrupta
-            sturw x9, [x10]          ; Reemplazar la instrucción en memoria con el nuevo OpCode inválido
-            b exc_trap               ; Saltar al bucle infinito de excepción
-
-exc_trap:   b exc_trap               ; Bucle infinito de excepción
 
 
 */
@@ -63,6 +80,11 @@ v. En cualquier caso se reemplaza el OpCode Inválido y se retorna al flujo orig
 vi. Ninguna es correcta, ya que la lógica dependerá del tipo de excepción. Verdadero. El enunciado especifica claramente el comportamiento para cada tipo de excepción.
 
 
+
+RESPUESTA: 
+ii. Ante una excepción por OpCode Inválido, queda atrapado en un bucle infinito.
+
+El código no está diseñado para manejar una excepción generada por un OpCode inválido en esta posición y, por lo tanto, el procesador quedaría atrapado en un bucle infinito.
 */
 
 
@@ -74,7 +96,7 @@ vi. Ninguna es correcta, ya que la lógica dependerá del tipo de excepción. Ve
 
 i. No es posible para el procesador determinar la dirección de retorno para este contexto. Verdadero
 
-ii. Siempre queda atrapado en el lazo "exc_trap". Falso. No necesariamente queda atrapado en "exc_trap" si se reemplaza la instrucción corrupta y se ejecuta una nueva instrucción válida.
+ii. Siempre queda atrapado en el lazo "exc_trap". Solo si x9 != 0x02
 
 iii. Siempre retorna a la dirección de memoria de la instrucción que generó la excepción + 4. Falso. No se especifica que siempre debe retornar a la dirección de memoria de la instrucción + 4.
 

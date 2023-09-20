@@ -10,7 +10,7 @@ trap:	    B trap
 
 /*
 Ante la ocurrencia de una excepción, el código queda atrapado en un lazo
-infinito…d. Ninguna de las anteriores es correcta.
+infinito…Solo si se trata de una interrupcion externa
 
 */
 
@@ -31,7 +31,7 @@ a. No realiza ninguna acción porque ya está en el vector de excepciones y reto
  “Este código retorna a la dirección de memoria donde se encuentra …”:
  
  
-c. La instrucción que estaba en ejecución al generarse una excepción por interrupción externa.
+b. … la siguiente instrucción que debía ejecutarse de no haberse producido la excepción por OpCode invalido.s
 
 */
 
