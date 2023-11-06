@@ -1,3 +1,5 @@
+
+
 Una caché asociativa por conjuntos consta de 64 líneas, dividida en 4 vías. La memoria principal
 contiene 4K bloques de 128 palabras cada uno. Muestre el formato de dirección de memoria principal
 suponiendo que cada palabra es direccionable directamente en memoria.
@@ -17,7 +19,7 @@ Vamos a calcular el número de bits necesarios para representar diferentes parte
    
    Numero de bloques en memoria principal = 4k bloques = 2**12 bloques
    						
-   Bits para bloque en memorai principal = log_2 (2**12) = 12 bits
+   Bits para bloque en memoria principal = log_2 (2**12) = 12 bits
 
 2. **Número de bits para representar cada palabra en un bloque:**
    - Cada bloque tiene 128 palabras, por lo que necesitamos log_2(128) bits para representar cada palabra en un bloque.

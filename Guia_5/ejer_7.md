@@ -21,7 +21,6 @@ cache, considerando datos, tags y los bits de status antes mencionados?
 
 A)
 
-Perfecto. Vamos a proceder con los cálculos.
 
 1. **Número de bits para representar cada bloque en la memoria principal:**
 
@@ -88,7 +87,7 @@ Área de etiquetas (Tag) = 32 bits - (1 bit + 6 bits + 1 bit) = 24 bits
 C)
 
 
-Dado el enunciado y la información proporcionada, una línea de la caché consta de los siguientes componentes:
+Una línea de la caché consta de los siguientes componentes:
 
 1. Datos: Tamaño de bloque en la caché (2 words de 32 bits cada uno).
 2. Etiqueta (Tag): Determinada por el tamaño de la dirección y el formato de la caché.

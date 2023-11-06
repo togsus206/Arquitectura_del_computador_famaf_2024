@@ -1,6 +1,9 @@
+
+
 Sea un sistema con una memoria principal de 1M palabras divididas en 4K bloques, donde cada
 palabra es direccionable directamente en memoria. Definir el formato de la dirección de memoria
 principal en los siguientes casos, sabiendo que la memoria caché posee 64 líneas:
+
 a. Memoria caché con función de correspondencia directa.
 
 b. Memoria caché con función de correspondencia full-asociativa.
@@ -13,25 +16,17 @@ c. Memoria caché con función de correspondencia asociativa de 8 vías.
 A)
 
 
-1. **Tamaño del bloque en la caché (datos):**
-   - Cada bloque tiene una palabra, y cada palabra tiene un tamaño 32 bits (según la información proporcionada), por lo que el tamaño de bloque es de 32 bits.
+En una memoria caché con función de correspondencia directa, cada línea de la caché está asociada con un único bloque de memoria principal. Por lo tanto, el formato de la dirección de memoria principal se compone de dos partes:
 
-2. **Número de líneas en la caché:**
-   - La caché tiene 64 líneas (según la información proporcionada).
+Etiqueta: identifica de forma única el bloque de memoria principal en la caché.
+Offset: identifica la palabra dentro del bloque de memoria principal.
+En este caso, la memoria principal tiene 1M palabras, que equivalen a 2^20 bits. Los bloques de memoria principal tienen 4K palabras, que equivalen a 2^12 bits.
 
-3. **Tamaño del índice:**
-   - Como hay 64 líneas en la caché, necesitaremos 6 bits para indexar cada línea 64 = 2^6.
+Por lo tanto, el tamaño de la etiqueta es de 20 bits, ya que es necesario para identificar de forma única un bloque de memoria principal en la caché. El tamaño del offset es de 12 bits, ya que es necesario para identificar la palabra dentro del bloque de memoria principal.
 
-4. **Tamaño de la etiqueta (Tag):**
-   - El tamaño de la dirección total es 32 bits (según la información proporcionada).
-   - Se resta el tamaño del índice y el tamaño del bloque para obtener el tamaño de la etiqueta:
-   - 32 - 6 - 32 = -6 bits. Sin embargo, no tiene sentido tener un tamaño negativo para la etiqueta, por lo que asumimos que la etiqueta es de 0 bits.
+Por lo tanto, el formato de la dirección de memoria principal es el siguiente:
 
-Por lo tanto, el formato de la dirección de memoria principal para una memoria caché con correspondencia directa es:
-
-- **Etiqueta (Tag):** 0 bits
-- **Índice:** 6 bits
-- **Desplazamiento:** 32 bits (tamaño del bloque)
+| Etiqueta (20 bits) | Offset (12 bits) |
 
 
 -------------------------------------------------------------------------------------------------------------
@@ -39,57 +34,37 @@ Por lo tanto, el formato de la dirección de memoria principal para una memoria 
 B)
 
 
-En una memoria caché con función de correspondencia full-asociativa, cada bloque de la memoria principal se puede ubicar en cualquier línea de la caché. Por lo tanto, la dirección de la memoria principal se divide en tres partes principales: la etiqueta (Tag), el índice y el desplazamiento.
+En una memoria caché con función de correspondencia full-asociativa, cualquier bloque de memoria principal puede almacenarse en cualquier línea de la caché. Por lo tanto, el formato de la dirección de memoria principal se compone de una sola parte:
 
+Etiqueta: identifica de forma única el bloque de memoria principal en la caché.
+En este caso, la memoria principal tiene 1M palabras, que equivalen a 2^20 bits. Los bloques de memoria principal tienen 4K palabras, que equivalen a 2^12 bits.
 
-Vamos a calcular el tamaño de cada parte:
+Por lo tanto, el tamaño de la etiqueta es de 20 bits, ya que es necesario para identificar de forma única un bloque de memoria principal en la caché.
 
-1. **Tamaño del bloque en la caché (datos):**
-   - Cada bloque tiene una palabra, y cada palabra tiene un tamaño que no se proporciona. Llamémoslo N bits.
+Por lo tanto, el formato de la dirección de memoria principal es el siguiente:
 
-2. **Número de líneas en la caché:**
-   - La caché tiene 64 líneas (según la información proporcionada).
+| Etiqueta (20 bits) |
 
-3. **Tamaño de la etiqueta (Tag):**
-   - El tamaño de la dirección total es 32 bits (según la información proporcionada).
-   - Restamos el tamaño del índice y el tamaño del bloque para obtener el tamaño de la etiqueta:
-   - 32 - log_2(64) - N, donde N es el tamaño de la palabra en bits.
-
-Por lo tanto, el formato de la dirección de memoria principal para una memoria caché con correspondencia full-asociativa es:
-
-- **Etiqueta (Tag):** 32 - log_2(64) - N bits
 - **Índice:** No se aplica en una caché full-asociativa
-- **Desplazamiento:** N bits (tamaño del bloque)
+- **Desplazamiento:** No se aplica en una caché full-asociativa
 
 --------------------------------------------------------------------------------------------------------------------------------
 
 C)
 
 
-En una memoria caché con función de correspondencia asociativa de 8 vías, cada bloque de la memoria principal puede ubicarse en cualquiera de las 8 líneas de una vía específica de la caché. Por lo tanto, la dirección de la memoria principal se divide en tres partes principales: la etiqueta (Tag), el índice y el desplazamiento.
+En una memoria caché con función de correspondencia asociativa de 8 vías, cualquier bloque de memoria principal puede almacenarse en cualquiera de las 8 líneas de la caché. Por lo tanto, el formato de la dirección de memoria principal se compone de tres partes:
 
+Conjunto: identifica el conjunto de la caché que contiene el bloque de memoria principal correspondiente.
+Vía: identifica la línea de caché específica dentro del conjunto.
+Etiqueta: identifica el bloque de memoria principal dentro del conjunto.
+En este caso, la memoria principal tiene 1M palabras, que equivalen a 2^20 bits. Los bloques de memoria principal tienen 4K palabras, que equivalen a 2^12 bits.
 
-Vamos a calcular el tamaño de cada parte:
+Por lo tanto, el tamaño del conjunto es de 20 bits, ya que es necesario para identificar de forma única un conjunto de la caché. El tamaño de la vía es de 3 bits(ya que son 8 vias 2**3), ya que es necesario para identificar de forma única una línea de caché dentro de un conjunto. El tamaño de la etiqueta es de 20 bits, ya que es necesario para identificar de forma única un bloque de memoria principal dentro de un conjunto.
 
-1. **Tamaño del bloque en la caché (datos):**
-   - Cada bloque tiene una palabra, y cada palabra tiene un tamaño que no se proporciona. Llamémoslo N bits.
+Por lo tanto, el formato de la dirección de memoria principal es el siguiente:
 
-2. **Número de líneas en una vía de la caché:**
-   - Cada vía tiene 64 líneas, por lo tanto, habrá 64 líneas en cada una de las 8 vías de la caché. 
-
-3. **Tamaño del índice:**
-   - Como hay 64 líneas en cada vía, necesitaremos log_2(64) = 6 bits para indexar cada línea en cada vía.
-
-4. **Tamaño de la etiqueta (Tag):**
-   - El tamaño de la dirección total es 32 bits (según la información proporcionada).
-   - Restamos el tamaño del índice y el tamaño del bloque para obtener el tamaño de la etiqueta:
-   - 32 - 6 - N, donde N es el tamaño de la palabra en bits.
-
-Por lo tanto, el formato de la dirección de memoria principal para una memoria caché con correspondencia asociativa de 8 vías es:
-
-- **Etiqueta (Tag):** 32 - 6 - N bits
-- **Índice:** 6 bits
-- **Desplazamiento:** N bits (tamaño del bloque)
+| Conjunto (20 bits) | Vía (3 bits) | Etiqueta (20 bits) |
 
 
 

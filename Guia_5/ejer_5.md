@@ -12,28 +12,74 @@ c. ¿Cuántos bits hay en cada línea de la memoria caché y cómo se dividen se
 
 ** A) 
 
-Total de bits en la direccion = bits para la etiqueta + bits para el indice + bits para el desplazamiento
+**Solución:**
 
-La memoria caché tiene líneas de 4 palabras de 16 bits cada una, lo que significa que cada línea tiene 
-4x16 bits
+**a. Determinación del número de bits para los diferentes campos de la dirección**
 
+Para determinar el número de bits para los diferentes campos de la dirección, se procede de la siguiente manera:
 
-Tamaño de cada linea de la cache = palabras por linea x tamaño de palabra (en bits)
-				= 4x16 = 64 bits
-				
-Numero de lineas en la cache = capacidad total de la cache/ tamaño de cada linea
-				= 1024/64 = 16 lineas
-				
-Por lo que sabemos que hay 16 lineas en la cache y cada linea contiene 64bits
+* **Tamaño de la memoria principal:** 64K bytes = 64K * 8 bits/byte = 512K bits
+* **Tamaño de la caché:** 1K bits
+* **Tamaño de la línea de caché:** 4 palabras * 16 bits/palabra = 64 bits
 
+**Cálculo del número de bits para la etiqueta:**
 
-Como tenemos 16 lineas (2**4 = 16) tenemos 4 bits para indexar cada linea.
-Como cada linea tiene un contiene 64 bits(2**6 = 64) entonces tenemos 6 bits para el desplazamiento 
+```
+Número de bits para la etiqueta = Tamaño de la memoria principal / Tamaño de la caché
+```
 
-Luego: 
+```
+Número de bits para la etiqueta = 512K bits / 1K bits = 512
+```
 
-bits para la etiqueta = Total de bits en la direccion - (Bits para el indice + bits para el desplazamiento)
-			= 64 -(4 + 6) = 54 
+**Cálculo del número de bits para el índice:**
+
+```
+Número de bits para el índice = Número de líneas de caché / Tamaño de la línea de caché
+```
+
+```
+Número de bits para el índice = 1K / 64 bits
+```
+
+```
+Número de bits para el índice = 16
+```
+
+**Cálculo del número de bits para el desplazamiento:**
+
+```
+Número de bits para el desplazamiento = Tamaño de la palabra / Tamaño del bloque de memoria
+```
+
+```
+Número de bits para el desplazamiento = 16 bits / 64 bits/bloque
+```
+
+```
+Número de bits para el desplazamiento = 2
+```
+
+**Formato de la dirección:**
+
+```
+| Etiqueta (512 bits) | Índice (16 bits) | Desplazamiento (2 bits) |
+```
+
+**Explicación:**
+
+* **La etiqueta:** identifica la línea de caché que contiene el bloque de memoria principal correspondiente.
+* **El índice:** identifica la línea de caché específica dentro de la caché.
+* **El desplazamiento:** identifica la palabra dentro del bloque de memoria principal.
+
+**Respuesta:**
+
+El número de bits para los diferentes campos de la dirección es el siguiente:
+
+* **Etiqueta:** 512 bits
+* **Índice:** 16 bits
+* **Desplazamiento:** 2 bits
+
 
 
 ----------------------------------------------------------------------------------------------------------------------------

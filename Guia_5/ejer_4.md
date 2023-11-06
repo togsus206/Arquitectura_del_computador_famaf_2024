@@ -144,7 +144,7 @@ A continuación, realizaremos este proceso para cada dirección:
 **Especificaciones para la caché:**
 - Tamaño de la caché: 8 bloques, es decir 2**3 = 8, 3 bits para el indice
 - Palabras por bloque: 2 palabras (requiere 1 bit para el desplazamiento)
-- Tamaño total de la caché (en palabras): 8 bloques * 2 palabras/bloque = 16 palabras, por lo que 2**4 = 16, es decir 4 bots de desplazamiento
+- Tamaño total de la caché (en palabras): 8 bloques * 2 palabras/bloque = 16 palabras, por lo que 2**4 = 16, es decir 4 bits de desplazamiento
 - Etiqueta 16 - 4 - 3 = 9
 
 
