@@ -1,3 +1,5 @@
+
+
 Considere que un sistema tiene una CACHE para DATOS de correspondencia ASOCIATIVA POR
 CONJUNTOS de 2 VÍAS de 256Kbyte y 4 palabras por línea, sobre un procesador de 32bits, CPI = 1,
 que resuelve todos los data y control hazard sin necesidad de stalls, tiene una memoria principal de
@@ -42,49 +44,45 @@ dirección base del arreglo A es 0x00001008?
 
 
 
----------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------
 
-A)
+**A)**
 
+El formato de memoria principal es el siguiente:
 
-**Detalles sobre la caché:**
-- Caché de datos de correspondencia asociativa por conjuntos de 2 vías.
-- Tamaño de la caché: 256 Kbytes.
-- 4 palabras por línea de caché.
+```
+| Dirección de memoria principal (32 bits) |
+```
 
-**Detalles sobre la memoria:**
-- Procesador de 32 bits.
-- Memoria principal con 4G palabras (cada palabra es de 1 byte).
+La dirección de memoria principal tiene 32 bits, ya que es necesario para identificar de forma única una palabra en la memoria principal.
 
-Primero, vamos a calcular el tamaño de una línea de caché y la cantidad de conjuntos en la caché.
+**Explicación:**
 
-**Tamaño de una línea de caché:**
-- Cada palabra es de 32 bits (4 bytes), y hay 4 palabras por línea.
-- Tamaño de una línea de caché: 4 palabras x 32 bits = 128 bits
+La dirección de memoria principal se compone de dos partes:
 
-**Cantidad de conjuntos en la caché:**
-- Tamaño total de la caché: 256 Kbytes
-- Tamaño de una línea de caché: 128 bits
-- Cantidad de conjuntos en la caché: (Tamaño total de la cache)/ (Tamaño de una linea de la cache) = 256 Kbytes/128 bits = 2048 conjuntos
+* **Offset:** identifica la palabra dentro de un bloque de memoria principal.
+
+En este caso, la memoria principal tiene 4G palabras, que equivalen a 2^32 bits. Los bloques de memoria principal tienen 4K palabras, que equivalen a 2^12 bits.
+
+Por lo tanto, el tamaño del offset es de 20 bits, ya que es necesario para identificar de forma única una palabra dentro de un bloque de memoria principal.
 
 
-Ahora, vamos a calcular la cantidad de bits necesarios para indexar un conjunto y para el desplazamiento dentro de una línea de caché.
+**Comentarios:**
 
-- Bits para indexar un conjunto: log_2(cantidad de conjuntos) = log_2(2048) = 11 bits
-- Bits para el desplazamiento dentro de una línea de caché: log_2(N de palabras por linea) = log_2(4) = 2 bits
+En este caso, la dirección de memoria principal es de 32 bits. Esto es suficiente para identificar de forma única una palabra en la memoria principal.
 
+Sin embargo, si la memoria principal fuera más grande, la dirección de memoria principal tendría que ser más grande para poder identificar de forma única una palabra en la memoria principal.
 
-Finalmente, los bits restantes en la dirección de 32 bits se usarán para la etiqueta.
+**Aclaración:**
 
-**Formato de la dirección en la memoria principal:**
-- Bits para el índice (index): 11 bits (para indexar el conjunto)
-- Bits para el desplazamiento (offset): 2 bits (para seleccionar la palabra dentro de la línea)
-- Bits para la etiqueta: 32 - 11 - 2 = 19 bits.
+En el enunciado del problema se especifica que la memoria caché tiene 2 vías, pero esto no afecta al formato de memoria principal. El formato de memoria principal es el mismo independientemente del número de vías de la caché.
 
-Entonces, el formato de dirección en la memoria principal sería:
+**Respuesta:**
 
-Formato de dirección:
-	[Índice (11 bits) | Desplazamiento (2 bits) | Etiqueta (19 bits) ]
+```
+| Dirección de memoria principal (32 bits) |
+```
+
 
 
 --------------------------------------------------------------------------------------------------------------------------------------
@@ -93,78 +91,43 @@ Formato de dirección:
 B)
 
 
-## Segmento 1: ##
 
-Para determinar la cantidad de misses de caché en 5 iteraciones del lazo para el segmento #1, necesitamos analizar cómo se acceden a la memoria en cada iteración y cómo interactúa con la caché.
+En el segmento #1, la primera instrucción LDURH x10, [x6, #0] produce un MISS de caché, ya que la dirección de memoria principal es 0x00001008, que no está en la caché.
 
-Primero, analicemos la instrucción de carga desde la memoria (LDURH) en el segmento #1: `LDURH x10, [x6, #0]`. Esta instrucción carga un valor de 16 bits (halfword) desde la dirección en `x6` con un offset de 0. 
+La segunda instrucción LDURH x11, [x6, #8] también produce un MISS de caché, ya que la dirección de memoria principal es 0x00001010, que no está en la caché.
 
-Sabemos que cada palabra es de 32 bits (4 bytes), y hay 4 palabras por línea de caché en la caché de datos. Por lo tanto, para determinar si hay un miss de caché, debemos verificar si la palabra que intentamos cargar está en la caché.
+Las siguientes instrucciones del lazo no producen MISS de caché, ya que las direcciones de memoria principal están en la caché.
 
-Dado que `x6` contiene la dirección base del arreglo `A` y el offset es 0, estamos cargando la primera palabra del arreglo `A`.
+Por lo tanto, en 5 iteraciones del lazo, se producen **2 MISS de caché**.
 
-**Dirección de la primera palabra de `A` para la primera iteración:**
-- Dirección base `x6` = 0x00001008 (suponiendo dirección base inicial de `A`)
-- Offset = 0 (primer elemento del arreglo)
-- Dirección = 0x00001008 + 0 = 0x00001008
+**Explicación:**
 
-Ahora, calculamos el índice del conjunto en la caché y la etiqueta para esta dirección:
+En la primera iteración del lazo, las direcciones de memoria principal son las siguientes:
 
-- Tamaño de una línea de caché: 128 bits (según el formato calculado anteriormente)
-- Tamaño de una palabra: 32 bits (4 bytes)
+* LDURH x10, [x6, #0]: 0x00001008
+* LDURH x11, [x6, #8]: 0x00001010
 
-**Índice del conjunto en la caché:**
-- Offset de palabra = log_2(Tamaño de una palabra) = log_2 (32) = 5 bits
-- Bits para el desplazamiento = log_2(Tamaño de una línea de caché) =log_2(128) = 7 bits
-- Bits para el índice del conjunto = 32 - 5 - 7 = 20 bits
+En la segunda iteración del lazo, las direcciones de memoria principal son las siguientes:
 
-Para calcular el índice del conjunto en la caché, tomamos los 20 bits intermedios de la dirección.
+* LDURH x10, [x6, #0]: 0x00001014
+* LDURH x11, [x6, #8]: 0x0000101c
 
-**Etiqueta:**
-- Bits para la etiqueta = (32 - Bits para el índice - Bits para el desplazamiento) 
-- Bits para la etiqueta = 32 - 20 - 7 = 5 bits
+En la tercera iteración del lazo, las direcciones de memoria principal son las siguientes:
 
-Ahora, veamos cómo se accede a la memoria en cada iteración y cuántos misses de caché ocurren:
+* LDURH x10, [x6, #0]: 0x00001020
+* LDURH x11, [x6, #8]: 0x00001028
 
-1. **Primera iteración:**
-   - La dirección de la primera palabra es 0x00001008 (ya calculado).
-   - Verificamos si la palabra está en la caché. Al ser la primera carga, no estará en la caché y habrá un miss.
+En la cuarta iteración del lazo, las direcciones de memoria principal son las siguientes:
 
-2. **Iteraciones posteriores:**
-   - En cada iteración, `x6` se incrementa en 4, lo que significa que accedemos a la siguiente palabra en el arreglo `A`.
-   - Dado que las palabras están separadas por 4 bytes, cada acceso en iteraciones posteriores será a una nueva línea de caché, lo que resultará en misses de caché.
+* LDURH x10, [x6, #0]: 0x0000102c
+* LDURH x11, [x6, #8]: 0x00001034
 
-En resumen, en cada iteración del lazo para el segmento #1 habrá un miss de caché, incluyendo la primera iteración. En 5 iteraciones, habrá 5 misses de caché.
+En la quinta iteración del lazo, las direcciones de memoria principal son las siguientes:
+
+* LDURH x10, [x6, #0]: 0x00001038
+* LDURH x11, [x6, #8]: 0x00001040
 
 
+Como se puede ver, solo hay 2 líneas de caché disponibles. La primera línea de caché contiene la dirección 0x00001008 en la primera iteración del lazo. La segunda línea de caché contiene la dirección 0x00001010 en la segunda iteración del lazo.
 
-## Segmento 2: ##
-
-
-En el segundo segmento, también estamos accediendo a la memoria con la instrucción `LDURH`, que carga una halfword (16 bits) desde la memoria. El offset es 0, lo que significa que estamos cargando la primera halfword del arreglo `A`.
-
-**Dirección de la primera halfword de `A` para el segundo segmento:**
-- Dirección base `x6` = 0x00001008 (suponiendo dirección base inicial de `A`)
-- Offset = 0 (primer elemento del arreglo)
-- Dirección = 0x00001008 + 0 = 0x00001008
-
-Vamos a calcular el índice del conjunto en la caché y la etiqueta para esta dirección, siguiendo el mismo proceso que hicimos en el cálculo anterior.
-
-**Índice del conjunto en la caché:**
-- Offset de palabra = log_2(Tamaño de una palabra) = log_2(32) = 5 bits
-- Bits para el desplazamiento = log_2(Tamaño de una línea de caché) = log_2(128) = 7 bits
-- Bits para el índice del conjunto = 32 - 5 - 7 = 20 bits
-
-Para calcular el índice del conjunto en la caché, tomamos los 20 bits intermedios de la dirección.
-
-**Etiqueta:**
-- Bits para la etiqueta = 32 - Bits para el índice - Bits para el desplazamiento 
-- Bits para la etiqueta = 32 - 20 - 7 = 5 bits
-
-Dado que estamos accediendo a la primera halfword en cada iteración, habrá un miss de caché en cada iteración del lazo para el segmento #2.
-
-En resumen, en cada iteración del lazo para el segmento #2 habrá un miss de caché. Si realizamos 5 iteraciones, habrá 5 misses de caché.
-
-
-
-
+En las siguientes iteraciones del lazo, las direcciones de memoria principal de las instrucciones LDURH x10, [x6, #0] se pueden almacenar en las líneas de caché que ya contienen las direcciones de memoria principal de las instrucciones LDURH x10, [x6, #0] de las iteraciones anteriores. Por lo tanto, no se producen MISS de caché.

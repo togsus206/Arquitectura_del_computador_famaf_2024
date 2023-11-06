@@ -2,9 +2,9 @@ La siguiente tabla muestra los datos de la caché de un solo nivel (L1) para dos
 (P1 y P2). En ambos procesadores el tiempo de acceso a memoria principal es de 70ns y el 36% de
 las instrucciones acceden a la memoria de datos.
 
-			L1 size 	L1 miss rate	L1 Hit Time
+				L1 size 	L1 miss rate	L1 Hit Time
 
-Procesador 1	    	2Kib			8%		0.66ns
+Procesador 1	    2Kib			8%		0.66ns
 
 Procesador 2 		4Kib			6%		0.9 ns
 
@@ -25,33 +25,22 @@ instrucciones y datos (mismo Miss Rate), ¿cuál es el CPI total para ambos proc
 
 A)
 
-Para calcular la frecuencia de reloj (CLK) para cada procesador, utilizaremos la fórmula que relaciona el tiempo de ciclo (TC) con el tiempo de acceso a la caché (Hit Time) y el tiempo de acceso a la memoria principal (Main Memory Access Time):
+El tiempo de ciclo de un procesador es el tiempo que tarda en ejecutar una instrucción. En este caso, el tiempo de ciclo se determina por el tiempo de acceso a la caché L1.
 
- TC = Max(Hit Time, Main Memory Access Time) 
+Procesador 1:
 
-Dado que se nos dice que el Hit Time determina el tiempo de ciclo, podemos usar esta fórmula para cada procesador y luego calcular la frecuencia de reloj (f) usando la relación f = 1/TC
+El tiempo de ciclo del procesador 1 es de 0,66 ns.
 
-Para el Procesador 1:
- TC_{P1} = Max(0.66 ns, 70 ns) = 70 ns
+f = 1 / t_ciclo
+f = 1 / 0,66 ns
+f = 1,51 ns
+Procesador 2:
 
-	f_p1 = 1/70ns 
+El tiempo de ciclo del procesador 2 es de 0,9 ns.
 
-Para el Procesador 2:
- TC_{P2} = Max(0.9 ns, 70 ns) = 70 ns
-
-	f_p2 = 1/70ns
-
-Dado que ambos procesadores tienen el mismo tiempo de ciclo, su frecuencia de reloj es la misma:
-
-	f_{P1} = f_{P2} = 1/70 ns
-
-Ahora, calculamos el valor numérico:
-	f_{P1} = f_{P2} = 1/(70x10-9)s
-
-
- f_{P1} = f_{P2} = 14.29 MHz
-
-Por lo tanto, la frecuencia de reloj para ambos procesadores es aproximadamente 14.29 MHz
+f = 1 / t_ciclo
+f = 1 / 0,9 ns
+f = 1,11 ns
 
 
 
@@ -61,7 +50,6 @@ Por lo tanto, la frecuencia de reloj para ambos procesadores es aproximadamente 
 
 
 B)
-
 
 
 El Average Memory Access Time (AMAT) se puede calcular utilizando la siguiente fórmula:
@@ -91,30 +79,43 @@ Para el Procesador 2:
 C)
 
 
+**Solución:**
 
-El CPI total (CPI_{total}) para ambos procesadores puede calcularse considerando el CPI base (CPI_{base}) de 1 (sin memory stalls) y sumando las penalidades derivadas de los fallos en la caché (memory stalls).
+El CPI total de un procesador es la suma del CPI de las instrucciones y el CPI de los datos.
 
- CPI_{total} = CPI_{base} + Memory Stall Cycles xMiss Rate 
+En este caso, el CPI de las instrucciones es de 1.
 
-Donde:
-- CPI_{base}  es el CPI base sin memory stalls, dado como 1.
-- Memory Stall Cycles es el número de ciclos de stall debidos a fallos de caché, igual al Miss Penalty.
-- Miss Rate es la tasa de fallos en la caché, proporcionada en la tabla.
+El CPI de los datos es igual al AMAT.
 
-Para el Procesador 1:
+**Procesador 1:**
 
-	 CPI_{total, P1} = 1 + Miss Penalty_{P1} x Miss Rate_{P1} 
+El CPI total del procesador 1 es de 6,18 ns.
 
-	 CPI_{total, P1} = 1 + 69.34 x 0.08 = 6.5472 
+```
+CPI_total = CPI_instrucciones + CPI_datos
+CPI_total = 1 + 6,18 ns
+CPI_total = 7,18 ns
+```
 
+**Procesador 2:**
 
-Para el Procesador 2:
+El CPI total del procesador 2 es de 5,05 ns.
 
-	 CPI_{total, P2} = 1 + Miss Penalty_{P2} x Miss Rate}_{P2}
+```
+CPI_total = CPI_instrucciones + CPI_datos
+CPI_total = 1 + 5,05 ns
+CPI_total = 6,05 ns
+```
 
-	 CPI_{total, P2} = 1 + 69.1 x 0.06 = 5.146 
+**Respuesta:**
 
-Comparando los CPI totales, el Procesador 2 (CPI_{total, P2} ≈ 5.146) tiene un CPI total menor, lo que significa que es más rápido en términos de rendimiento en comparación con el Procesador 1 (CPI_{total, P1} ≈ 6.5472).
+El CPI total del procesador 2 es de 6,05 ns, que es menor que el CPI total del procesador 1, que es de 7,18 ns. Por lo tanto, el procesador 2 es más rápido que el procesador 1.
+
+**Explicación:**
+
+El procesador 2 tiene un CPI total menor que el procesador 1 porque tiene un AMAT menor. Esto se debe a que tiene una tasa de fallos de caché más baja.
+
+En resumen, el procesador 2 es más rápido que el procesador 1 porque tiene un CPI total menor.
 
 
 

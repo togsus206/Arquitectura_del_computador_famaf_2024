@@ -62,38 +62,22 @@ Por lo tanto, el tiempo promedio de acceso a la memoria (AMAT) es de 31 ns.
 B)
 
 
-Para determinar los ciclos de reloj por instrucción (CPI) en promedio para las instrucciones de carga (load) y almacenamiento (store), debemos considerar el tiempo que tarda cada tipo de instrucción en la caché de datos y en la memoria principal, teniendo en cuenta las tasas de aciertos y fallos en la caché.
+**Solución:**
 
-Dado que en el punto a) se menciona que la caché de instrucciones siempre acierta (es perfecta), solo necesitamos considerar la caché de datos.
+El CPI (ciclos de reloj por instrucción) es el número de ciclos de reloj que tarda en ejecutarse una instrucción en promedio.
 
-El CPI para instrucciones de carga (load) y almacenamiento (store) se puede calcular utilizando la siguiente fórmula:
+En este caso, el CPI para instrucciones load y store es de **31 ciclos de reloj**.
 
-CPI_avg = Ciclos_en_caché + (Miss_rate x Miss_penalty)
+**Explicación:**
 
-Donde:
+El CPI para instrucciones load y store es igual al AMAT, ya que estas instrucciones requieren un acceso a la memoria.
 
-- **Ciclos en caché** es el número de ciclos de reloj que se tarda cuando hay un acierto en la caché (en este caso, 1 ciclo de reloj, dado que es un hit).
+Por lo tanto, el CPI es de **31 ciclos de reloj**.
 
-- **Miss rate** es la tasa de fallos en la caché (que se menciona como 15% o 0.15 en forma decimal).
+**Respuesta:**
 
-- **Miss penalty** es el número de ciclos de reloj adicionales que se tarda cuando hay un fallo en la caché (200 ciclos de reloj, dado en el problema).
+El CPI para instrucciones load y store es de **31 ciclos de reloj**.
 
-Para instrucciones de carga (load), se necesita acceder a datos en la memoria, por lo que se considerará la caché de datos. Para instrucciones de almacenamiento (store), también se necesita acceder a la memoria, por lo que también se considerará la caché de datos.
-
-1. **Ciclos en caché (load/store):**
-   En el caso de acierto en la caché (hit), se tarda 1 ciclo de reloj, ya que se menciona que el hit time es 1 ciclo de clock.
-
-2. **Miss penalty (load/store):**
-   Si hay un fallo en la caché (miss), se tarda 200 ciclos de reloj, ya que se menciona que para un fallo se detiene el procesador durante 200 ns para acceder a la memoria principal.
-
-3. **Miss rate (load/store):**
-   La tasa de fallos es del 15% o 0.15.
-
-Ahora, sustituimos estos valores en la fórmula del CPI:
-
- CPI_load = 1 + (0.15 x 200) = 31 CPI
-
- CPI_store = 1 + (0.15 x 200) = 31 CPI
 
 
 --------------------------------------------------------------------------------------------------------------------------------
