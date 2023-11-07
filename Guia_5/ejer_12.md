@@ -34,6 +34,7 @@ El tiempo de ciclo del procesador 1 es de 0,66 ns.
 f = 1 / t_ciclo
 f = 1 / 0,66 ns
 f = 1,51 ns
+
 Procesador 2:
 
 El tiempo de ciclo del procesador 2 es de 0,9 ns.

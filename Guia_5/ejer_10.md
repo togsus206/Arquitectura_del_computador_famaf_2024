@@ -1,3 +1,4 @@
+
 Encuentre el AMAT (Average Memory Access Time) para un procesador con un tiempo de ciclo de 1
 ns, un miss penalty de 20 ciclos de reloj, un miss rate de 5% fallos por instrucción y un tiempo de
 acceso a caché (incluida la detección de acierto) de 1 ciclo de reloj. Suponga que las penalizaciones
