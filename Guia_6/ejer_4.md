@@ -1,12 +1,12 @@
 Asumiendo que la distribución de instrucciones dinámicas se divide en las siguientes categorías:
 
-R-type 		CBZ/CBZN	B	LDUR	STUR
-40%		25%		5%	25%	5%
+R-type 		CBZ/CBZN	B		LDUR	STUR
+40%			25%			5%		25%		5%
 
 y las siguientes precisiones en los métodos de predicción de salto:
 
-Always-Taken		Always-Not-Taken	2-Bit
-45%			55%			85%
+Always-Taken		Always-Not-Taken		2-Bit
+45%						55%					85%
 
 
 Considerando que el resultado y la dirección del salto se determinan en la etapa de decodificación
@@ -50,7 +50,7 @@ CPI extras = 25% (frecuencia de instrucciones CBZ/CBZN) * 1 (ciclo extra por fal
             = 0.5556 ciclos extras por instrucción
 
 Esto significa que, en promedio, se producen 0.5556 ciclos extras por instrucción debido a los fallos de predicción del método Always-Taken.
-
+	
 
 -----------------------------------------------------------------------------------------------------------------------
 

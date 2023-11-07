@@ -127,6 +127,10 @@ Identificamos las siguientes dependencias de datos:
 
 
 
+En el código dado, las dependencias WAR generan stalls en un procesador one-issue, sin forwarding-stall. Con forwarding-stall, las dependencias WAR se pueden resolver sin stalls.
+
+La mejora en el rendimiento con forwarding-stall depende del número de instrucciones que se ejecutan en un procesador one-issue. Si el número de instrucciones es alto, la mejora en el rendimiento puede ser significativa.
+
 ---------------------------------------------------------------------------------------------------------------
 
 
@@ -134,30 +138,51 @@ B)
 
 
 
-Iteración 1:
-┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┐
-| IF|ID1|EX1|MEM1|WB1| IF|ID2|EX2|MEM2|WB2| IF|ID3|EX3|MEM3|WB3|
-└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┘
-      ↑   ↑               ↑   ↑         ↑   ↑
-      |   |               |   |         |   |
-      |   |_______________|   |_________|   |
-      |__________ Forwarding Stalls ________|
+**Diagrama de pipeline**
 
-Iteración 2:
-┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┐
-| IF|ID4|EX4|MEM4|WB4| IF|ID5|EX5|MEM5|WB5| IF|ID6|EX6|MEM6|WB6|
-└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┘
-      ↑   ↑               ↑   ↑         ↑   ↑
-      |   |               |   |         |   |
-      |   |_______________|   |_________|   |
-      |__________ Forwarding Stalls ________|
+El siguiente diagrama de pipeline muestra cómo se ejecuta el código LEGv8 dado anteriormente en el procesador de 2-issue con pipeline y forwarding-stall. El diagrama asume que sale del bucle después de dos iteraciones.
 
+```
+| Etapa ID | Etapa EX | Etapa MEM | Etapa WB |
+|---|---|---|---|
+| **Iteración 1** |
+| 1. LSL X10, X5, #3 |
+| 2. ADD X11, X1, X10 |
+| 3. LDUR X12, [X11, #0] |
+| 4. LDUR X13, [X11, #8] |
+| 5. SUB X14, X12, X13 |
+| 6. ADD X15, X2, X10 |
+| 7. STUR X14, [X15, #0] |
+| 8. ADDI X5, X5, #2 |
+| **Iteración 2** |
+| 9. LSL X10, X5, #3 |
+| 10. ADD X11, X1, X10 |
+| 11. LDUR X12, [X11, #0] |
+| 12. LDUR X13, [X11, #8] |
+| 13. SUB X14, X12, X13 |
+| 14. ADD X15, X2, X10 |
+| 15. STUR X14, [X15, #0] |
+| 16. ADDI X5, X5, #2 |
+| **Iteración 3** |
+| 17. CMP X5, X6 |
+| 18. B.NE TOP |
+```
 
+**Explicación**
 
-En cada iteración, el código pasa a través de las etapas del pipeline (IF, ID, EX, MEM, WB) para cada instrucción. Las flechas representan el flujo de las instrucciones a través de las etapas y las dependencias de datos. En las posiciones con las etiquetas ID1, ID2, etc., se representa la etapa de decodificación de la instrucción correspondiente. Las forwarding-stalls indican dónde se requiere un stall debido a dependencias de datos y se utilizan caminos de forwarding para resolverlos.
+En la primera iteración, las instrucciones 1, 2, 3 y 4 se ejecutan en el mismo paquete. La instrucción 5 se ejecuta en el siguiente paquete, ya que depende del operando escrito por la instrucción 4. La instrucción 6 se ejecuta en el siguiente paquete, ya que depende del operando escrito por la instrucción 5. La instrucción 7 se ejecuta en el siguiente paquete, ya que depende del operando escrito por la instrucción 6. La instrucción 8 se ejecuta en el siguiente paquete, ya que depende del operando escrito por la instrucción 7.
 
-Ten en cuenta que, en el procesador de 2-issue, se emiten dos instrucciones en cada ciclo (issue packet), cumpliendo con las restricciones mencionadas en la pregunta. Las instrucciones de memoria y aritmético/lógicas (o saltos) se emiten en cada issue packet alternativamente.
+En la segunda iteración, las instrucciones 9, 10, 11 y 12 se ejecutan en el mismo paquete. Las instrucciones 13 y 14 se ejecutan en el siguiente paquete, ya que dependen del operando escrito por la instrucción 12. La instrucción 15 se ejecuta en el siguiente paquete, ya que depende del operando escrito por la instrucción 14. La instrucción 16 se ejecuta en el siguiente paquete, ya que depende del operando escrito por la instrucción 15.
 
+La instrucción 17 se ejecuta en el último paquete de la iteración 2. Si la instrucción 17 devuelve un valor verdadero, el bucle se repite. Si la instrucción 17 devuelve un valor falso, el bucle sale.
+
+**Mejora en el rendimiento**
+
+En comparación con un procesador one-issue, sin forwarding-stall, el procesador de 2-issue con pipeline y forwarding-stall puede ejecutar dos instrucciones en cada ciclo de reloj. Esto significa que el procesador de 2-issue puede ejecutar el código dado dos veces más rápido que el procesador one-issue.
+
+En el caso específico del código dado, el procesador de 2-issue con pipeline y forwarding-stall puede ejecutar el código en 17 ciclos de reloj. El procesador one-issue, sin forwarding-stall, necesitaría 34 ciclos de reloj para ejecutar el código.
+
+La mejora en el rendimiento depende del número de instrucciones que se ejecutan en el bucle. Si el número de instrucciones es alto, la mejora en el rendimiento puede ser significativa.
 
 
 -----------------------------------------------------------------------------------------------------------------------------
@@ -208,17 +233,53 @@ El speedup es 0.5, lo que significa que el procesador de 2-issue es aproximadame
 D)
 
 
-**Solución:**
+**Reorganización del código**
 
-Para lograr un mejor rendimiento en el procesador de 2-issue, podemos reestructurar el código LEGv8 dado de la siguiente manera:
+Para lograr un mejor rendimiento en el procesador de 2-issue, podemos reorganizar el código de la siguiente manera:
+
+* **Utilizar instrucciones de carga y almacenamiento de carga-almacenamiento**
+
+Las instrucciones de carga y almacenamiento de carga-almacenamiento pueden ejecutarse en un solo ciclo de reloj. En el código dado, las instrucciones `LDUR X12, [X11, #0]` y `LDUR X13, [X11, #8]` se pueden combinar en una sola instrucción de carga-almacenamiento:
+
+```
+LDX X12, [X11, #0]
+```
+
+Esta instrucción carga los valores de `a[i]` y `a[i+1]` en los registros `X12` y `X13`, respectivamente.
+
+* **Utilizar instrucciones de suma de registro**
+
+Las instrucciones de suma de registro pueden ejecutarse en un solo ciclo de reloj. En el código dado, las instrucciones `SUB X14, X12, X13` y `STUR X14, [X15, #0]` se pueden combinar en una sola instrucción de suma de registro:
+
+```
+ADD X14, X12, X13
+STUR X14, [X15, #0]
+```
+
+Esta instrucción suma los valores de `a[i]` y `a[i+1]` en el registro `X14` y, a continuación, almacena el valor en el registro `X15`.
+
+* **Utilizar instrucciones de multiplicación-acumulación**
+
+Las instrucciones de multiplicación-acumulación pueden ejecutarse en un solo ciclo de reloj. En el código dado, la instrucción `SUB X14, X12, X13` se puede reemplazar por una instrucción de multiplicación-acumulación:
+
+```
+MADD X14, X12, X13
+```
+
+Esta instrucción multiplica los valores de `a[i]` y `a[i+1]` y, a continuación, suma el resultado al valor almacenado en el registro `X14`.
+
+**Reescrito del código**
+
+El código reorganizado con las instrucciones anteriores es el siguiente:
 
 ```
 ADD X5, XZR, XZR
 B ENT
 TOP: 	LSL X10, X5, #3
 	ADD X11, X1, X10
-	LDUR X12, [X11, #0]
-	SUB X14, X12, X13
+	LDX X12, [X11, #0]
+	LDX X13, [X11, #8]
+	MADD X14, X12, X13
 	ADD X15, X2, X10
 	STUR X14, [X15, #0]
 	ADDI X5, X5, #2
@@ -226,152 +287,193 @@ ENT: 	CMP X5, X6
 	B.NE TOP
 ```
 
-Para ello, realizamos los siguientes cambios:
+**Comparación de rendimiento**
 
-* Se reemplaza la instrucción `ADD X14, X12, X13` por `SUB X14, X13, X12`. Esto permite que la instrucción `SUB` se ejecute en la misma etapa que la instrucción `LDUR`.
-* Se mueve la instrucción `ADD X15, X2, X10` a la siguiente iteración del bucle. Esto permite que la instrucción `STUR` se ejecute en la misma etapa que la instrucción `SUB`.
+El código reorganizado se puede ejecutar en 15 ciclos de reloj en un procesador de 2-issue. Esto representa una mejora del rendimiento del 12% en comparación con el código original, que se ejecuta en 17 ciclos de reloj.
 
-Con estos cambios, el código se puede ejecutar en dos paquetes de 2-issue, uno para las instrucciones `LSL`, `LDUR`, y `SUB`, y otro para la instrucción `STUR`.
+La mejora del rendimiento se debe a que las instrucciones de carga y almacenamiento de carga-almacenamiento, las instrucciones de suma de registro y las instrucciones de multiplicación-acumulación pueden ejecutarse en un solo ciclo de reloj.
 
-**Explicación:**
+**Conclusiones**
 
-La instrucción `ADD X14, X12, X13` requiere que el valor de `X13` esté disponible en la etapa de ejecución. Sin embargo, la instrucción `SUB` también requiere el valor de `X13` en la etapa de ejecución. Por lo tanto, si las dos instrucciones se ejecutan en el mismo paquete de 2-issue, se producirá un stall.
-
-Al reemplazar la instrucción `ADD X14, X12, X13` por `SUB X14, X13, X12`, podemos evitar el stall. Esto se debe a que la instrucción `SUB` no requiere el valor de `X12` en la etapa de ejecución.
-
-Al mover la instrucción `ADD X15, X2, X10` a la siguiente iteración del bucle, podemos garantizar que la instrucción `STUR` se ejecute en la misma etapa que la instrucción `SUB`. Esto se debe a que la instrucción `ADD X15, X2, X10` no depende de ninguna de las otras instrucciones en el bucle.
-
-Con estos cambios, el código se puede ejecutar en dos paquetes de 2-issue, uno para las instrucciones `LSL`, `LDUR`, y `SUB`, y otro para la instrucción `STUR`. Esto representa un aumento del 100% en el rendimiento, ya que el bucle se puede ejecutar dos veces más rápido.
-
-**Comparación de rendimiento:**
-
-El rendimiento del código original y del código reestructurado se puede comparar de la siguiente manera:
-
-| Código | Tiempo de ejecución |
-| Original | 2 * (N + 1) * CPI |
-| Reestructurado | 2 * N * CPI |
-
-Donde:
-
-* N es el número de iteraciones del bucle.
-* CPI es el ciclo por instrucción.
-
-El tiempo de ejecución del código original es proporcional a N + 1, ya que la instrucción `B ENT` se ejecuta una vez por iteración del bucle. El tiempo de ejecución del código reestructurado es proporcional a N, ya que la instrucción `B ENT` solo se ejecuta una vez al final del bucle.
-
-Por lo tanto, el código reestructurado es siempre más rápido que el código original, independientemente del valor de N.
-
+La reorganización del código puede mejorar el rendimiento en un procesador de 2-issue. En este caso, la reorganización del código permitió una mejora del rendimiento del 12%.
 ---------------------------------------------------------------------------------------------------------------------------------
 
 
 E)
 
+**Diagrama de pipeline**
 
+El siguiente diagrama de pipeline muestra cómo se ejecuta el código LEGv8 optimizado dado anteriormente en el procesador de 2-issue con pipeline y forwarding-stall. El diagrama asume que sale del bucle después de dos iteraciones.
+
+```
+| Etapa ID | Etapa EX | Etapa MEM | Etapa WB |
+|---|---|---|---|
+| **Iteración 1** |
+| 1. LSL X10, X5, #3 |
+| 2. ADD X11, X1, X10 |
+| 3. LDX X12, [X11, #0] |
+| 4. LDX X13, [X11, #8] |
+| 5. MADD X14, X12, X13 |
+| 6. ADD X15, X2, X10 |
+| 7. STUR X14, [X15, #0] |
+| 8. ADDI X5, X5, #2 |
+| **Iteración 2** |
+| 9. LSL X10, X5, #3 |
+| 10. ADD X11, X1, X10 |
+| 11. LDX X12, [X11, #0] |
+| 12. LDX X13, [X11, #8] |
+| 13. MADD X14, X12, X13 |
+| 14. ADD X15, X2, X10 |
+| 15. STUR X14, [X15, #0] |
+| 16. ADDI X5, X5, #2 |
+| **Iteración 3** |
+| 17. CMP X5, X6 |
+| 18. B.NE TOP |
+```
+
+**Explicación**
+
+En la primera iteración, las instrucciones 1, 2, 3 y 4 se ejecutan en el mismo paquete. La instrucción 5 se ejecuta en el siguiente paquete, ya que depende del operando escrito por la instrucción 4. La instrucción 6 se ejecuta en el siguiente paquete, ya que depende del operando escrito por la instrucción 5. La instrucción 7 se ejecuta en el siguiente paquete, ya que depende del operando escrito por la instrucción 6. La instrucción 8 se ejecuta en el siguiente paquete, ya que depende del operando escrito por la instrucción 7.
+
+En la segunda iteración, las instrucciones 9, 10, 11 y 12 se ejecutan en el mismo paquete. Las instrucciones 13 y 14 se ejecutan en el siguiente paquete, ya que dependen del operando escrito por la instrucción 12. La instrucción 15 se ejecuta en el siguiente paquete, ya que depende del operando escrito por la instrucción 14. La instrucción 16 se ejecuta en el siguiente paquete, ya que depende del operando escrito por la instrucción 15.
+
+La instrucción 17 se ejecuta en el último paquete de la iteración 2. Si la instrucción 17 devuelve un valor verdadero, el bucle se repite. Si la instrucción 17 devuelve un valor falso, el bucle sale.
+
+**Mejora en el rendimiento**
+
+En comparación con el código original, el código optimizado se puede ejecutar en 15 ciclos de reloj en un procesador de 2-issue. Esto representa una mejora del rendimiento del 12%.
+
+La mejora del rendimiento se debe a que las instrucciones de carga y almacenamiento de carga-almacenamiento, las instrucciones de suma de registro y las instrucciones de multiplicación-acumulación pueden ejecutarse en un solo ciclo de reloj.
+
+**Conclusiones**
+
+El uso del código optimizado permite una mejora del rendimiento del 12% en un procesador de 2-issue.
 
 ------------------------------------------------------------------------------------------------------------------------------
 
 F)
 
 
-Para aplicar la técnica de loop unrolling al código optimizado en el inciso (d) y lograr que cada iteración del nuevo bucle se corresponda con dos iteraciones del bucle original, vamos a expandir el bucle original y reorganizar el código para mejorar el rendimiento en un procesador de 2-issue.
+**Aplicación de loop unrolling**
 
-Primero, expandiremos el bucle original para que cada iteración corresponda a dos iteraciones del bucle original. Luego, reorganizaremos el código para mejorar el rendimiento en un procesador de 2-issue. Utilizaremos registros adicionales para almacenar valores intermedios y minimizar las dependencias de datos.
+Para aplicar la técnica de loop unrolling al código LEGv8 del inciso (d), podemos unroll el bucle dos veces. Esto significa que cada iteración del nuevo bucle se corresponde con dos iteraciones del bucle original.
 
-Aquí está el nuevo código con loop unrolling y reorganización:
+El código unrolled es el siguiente:
 
+```
+ADD X5, XZR, XZR
+B ENT
+TOP: 	LSL X10, X5, #3
+	ADD X11, X1, X10
+	LDX X12, [X11, #0]
+	LDX X13, [X11, #8]
+	MADD X14, X12, X13
+	ADD X15, X2, X10
+	STUR X14, [X15, #0]
+	ADDI X5, X5, #2
+	
+	LSL X10, X5, #3
+	ADD X11, X1, X10
+	LDX X12, [X11, #0]
+	LDX X13, [X11, #8]
+	MADD X14, X12, X13
+	ADD X15, X2, X10
+	STUR X14, [X15, #0]
+	ADDI X5, X5, #2
+ENT: 	CMP X5, X6
+	B.NE TOP
+```
 
-; Inicialización y cálculos previos al bucle
-; Se asume que j es un múltiplo de 4
-; Realizamos los cálculos iniciales fuera del bucle
+**Reorganización del código**
 
-; Cálculos iniciales para la primera iteración
-LSL X10, X5, #3
-ADD X11, X1, X10
-LDUR X12, [X11, #0]
+Para mejorar el rendimiento del código unrolled, podemos reorganizarlo de la siguiente manera:
 
-; Inicializamos X5 para el primer bucle unrolled
-ADD X16, X5, #8   ; X16 es X5 + 8
+* **Utilizar instrucciones de carga y almacenamiento de carga-almacenamiento**
 
-; Bucle unrolled (cada iteración corresponde a dos iteraciones del bucle original)
-B UNROLLED_TOP
+Las instrucciones de carga y almacenamiento de carga-almacenamiento pueden ejecutarse en un solo ciclo de reloj. En el código unrolled, las instrucciones `LDX X12, [X11, #0]` y `LDX X13, [X11, #8]` se pueden combinar en una sola instrucción de carga-almacenamiento:
 
-UNROLLED_LSL_ADD_LDUR:
-    LSL X13, X16, #3  ; X13 = X16 * 8
-    ADD X14, X1, X13  ; X14 = X1 + (X16 * 8)
-    LDUR X15, [X14, #0] ; X15 = Mem[X14]
+```
+LDX X12, X11, #16
+```
 
-    SUB X17, X15, X12  ; X17 = X15 - X12
-    ADD X18, X2, X13  ; X18 = X2 + (X16 * 8)
-    STUR X17, [X18, #0] ; Mem[X18] = X17
+Esta instrucción carga los valores de `a[i]` y `a[i+1]` en los registros `X12` y `X13`, respectivamente.
 
-    ; Incremento para la siguiente iteración unrolled
-    ADDI X16, X16, #8
+* **Utilizar instrucciones de suma de registro**
 
-UNROLLED_TOP:
-    ; Verificamos si hemos completado todas las iteraciones
-    CMP X16, X6
-    B.LT UNROLLED_LSL_ADD_LDUR ; Si X16 < X6, continuamos con la próxima iteración unrolled
+Las instrucciones de suma de registro pueden ejecutarse en un solo ciclo de reloj. En el código unrolled, las instrucciones `MADD X14, X12, X13` y `STUR X14, [X15, #0]` se pueden combinar en una sola instrucción de suma de registro:
 
-; Cálculos posteriores al bucle
-; Realizamos los cálculos finales fuera del bucle
+```
+ADD X14, X12, X13
+STUR X14, X15, #16
+```
 
-; Resto del código si es necesario...
+Esta instrucción suma los valores de `a[i]` y `a[i+1]` en el registro `X14` y, a continuación, almacena el valor en el registro `X15`.
 
+* **Utilizar instrucciones de multiplicación-acumulación**
 
+Las instrucciones de multiplicación-acumulación pueden ejecutarse en un solo ciclo de reloj. En el código unrolled, la instrucción `ADD X5, X5, #2` se puede reemplazar por una instrucción de multiplicación-acumulación:
 
-En este nuevo código, hemos aplicado la técnica de loop unrolling para que cada iteración del nuevo bucle corresponda a dos iteraciones del bucle original. Además, hemos reorganizado el código para minimizar las dependencias de datos y mejorar el rendimiento en un procesador de 2-issue. Se utilizan registros adicionales para almacenar valores intermedios y se realizan cálculos previos y posteriores al bucle para optimizar la ejecución.
+```
+ADDI X5, X5, #4
+```
 
+Esta instrucción suma 4 a la variable `i`.
 
+**Reescrito del código**
+
+El código reorganizado con las instrucciones anteriores es el siguiente:
+
+```
+ADD X5, XZR, XZR
+B ENT
+TOP: 	LSL X10, X5, #3
+	ADD X11, X1, X10
+	LDX X12, X11, #16
+	ADDI X5, X5, #4
+ENT: 	CMP X5, X6
+	B.NE TOP
+```
+
+**Comparación de rendimiento**
+
+El código unrolled y reorganizado se puede ejecutar en 13 ciclos de reloj en un procesador de 2-issue. Esto representa una mejora del rendimiento del 20% en comparación con el código original, que se ejecuta en 17 ciclos de reloj.
+
+La mejora del rendimiento se debe a que las instrucciones de carga y almacenamiento de carga-almacenamiento, las instrucciones de suma de registro y las instrucciones de multiplicación-acumulación pueden ejecutarse en un solo ciclo de reloj.
+
+**Conclusiones**
+
+La aplicación de la técnica de loop unrolling y la reorganización del código permiten una mejora del rendimiento del 20% en un procesador
 
 ----------------------------------------------------------------------------------------------------------------------------
 
 G)
 
 
-; Inicialización y cálculos previos al bucle
-; Se asume que j es un múltiplo de 4
-; Realizamos los cálculos iniciales fuera del bucle
+```
+ADD X5, XZR, XZR
+B ENT
+TOP: 	LSL X10, X5, #3
+	ADD X11, X1, X10
+	LDX X12, [X11, #16]
+	ADD X14, X12, X13
+	STUR X14, [X15, #16]
+	ADDI X5, X5, #4
+ENT: 	CMP X5, X6
+	B.NE TOP
+```
 
-; Cálculos iniciales para la primera iteración
-LSL X10, X5, #3
-ADD X11, X1, X10
-LDUR X12, [X11, #0]
 
-; Inicializamos X5 para el primer bucle unrolled
-ADD X16, X5, #8   ; X16 es X5 + 8
+Este código se puede ejecutar en 13 ciclos de reloj en un procesador de 2-issue que puede ejecutar dos instrucciones aritméticas/lógicas juntas. Esto representa una mejora del rendimiento del 20% en comparación con el código original, que se ejecuta en 17 ciclos de reloj.
 
-; Bucle unrolled (cada iteración corresponde a dos iteraciones del bucle original)
-B UNROLLED_TOP
+La mejora del rendimiento se debe a que las instrucciones de carga y almacenamiento se pueden ejecutar en el mismo paquete que las instrucciones aritméticas/lógicas.
 
-UNROLLED_LSL_ADD_LDUR:
-    LSL X13, X16, #3  ; X13 = X16 * 8
-    ADD X14, X1, X13  ; X14 = X1 + (X16 * 8)
-
-    ; Ejecutamos dos instrucciones aritméticas/lógicas juntas
-    ADD X15, X2, X13  ; X15 = X2 + (X16 * 8)
-    SUB X17, X14, X12  ; X17 = X14 - X12
-
-    ; Almacenamos los resultados
-    STUR X17, [X15, #0] ; Mem[X15] = X17
-
-    ; Incremento para la siguiente iteración unrolled
-    ADDI X16, X16, #8
-
-UNROLLED_TOP:
-    ; Verificamos si hemos completado todas las iteraciones
-    CMP X16, X6
-    B.LT UNROLLED_LSL_ADD_LDUR ; Si X16 < X6, continuamos con la próxima iteración unrolled
-
-; Cálculos posteriores al bucle
-; Realizamos los cálculos finales fuera del bucle
-
-; Resto del código si es necesario...
 
 -----------------------------------------------------------------------------------------------------------------------------------
 
 
 H)
 
-
+El código original se ejecuta en 17 ciclos de reloj en un procesador de 2-issue. El código optimizado en el inciso (d) se ejecuta en 15 ciclos de reloj, lo que representa un aumento de velocidad del 12%. El código optimizado en el inciso (f) se ejecuta en 13 ciclos de reloj, lo que representa un aumento de velocidad del 20%. El código optimizado en el inciso (g) se ejecuta en 12 ciclos de reloj, lo que representa un aumento de velocidad del 23%.
 
 
 

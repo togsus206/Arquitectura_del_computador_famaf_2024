@@ -1,6 +1,6 @@
 Considere un procesador LEGv8 two-issue, donde en cada “issue packet” una de las instrucciones
-puede ser una operación de la ALU o un salto y la otra puede ser un load o store, tal como se
-muestra en la figura. El compilador asume toda la responsabilidad de eliminar los hazard, organizar el
+puede ser una operación de la ALU o un salto y la otra puede ser un load o store.
+El compilador asume toda la responsabilidad de eliminar los hazard, organizar el
 código e insertar operaciones tipo “nop” para que el código se ejecute sin necesidad de detección de
 hazard o generación de stalls.
 
@@ -50,12 +50,12 @@ Dependencias de datos:
 
 B)
 
-.....		ALU or branch instruction	Data transfer instruction 	clock cycle
-Loop:							LDUR x0,[x20,#0]	1
-		SUBI x20, x20, #8						2
-		ADD x0, x0, x21							3
-		CMP x20, x22							4
-		BGT Loop				STUR x0, [x20, #8]	5
+.....ALU or branch instruction	Data transfer instruction 	clock cycle
+Loop:							LDUR x0,[x20,#0]			1
+		SUBI x20, x20, #8									2
+		ADD x0, x0, x21										3
+		CMP x20, x22										4
+		BGT Loop				STUR x0, [x20, #8]			5
 		
 		
 		
@@ -129,23 +129,23 @@ Quedando Asi:
 
 
 
-....		ALU or branch instruction	Data transfer instruction
-Loop:		NOP				LDUR x1, [x20, #8]
-		NOP				LDUR x0, [x20, #-8]
-		ADD x1, x1, x21			nop
-		ADD X0, X0, X21			STUR X1, [X20, #0]
-		SUBI X20, X20, #16		STUR X0, [X20, #-8]
-		CMP X20, X22			NOP
-		B.GT Loop			nop
+....	ALU or branch instruction		Data transfer instruction
+Loop:	NOP								LDUR x1, [x20, #8]
+		NOP								LDUR x0, [x20, #-8]
+		ADD x1, x1, x21					nop
+		ADD X0, X0, X21					STUR X1, [X20, #0]
+		SUBI X20, X20, #16				STUR X0, [X20, #-8]
+		CMP X20, X22					NOP
+		B.GT Loop						nop
 
 
 
-.....		ALU or branch instruction	Data transfer instruction 	clock cycle
-Loop:		SUBI x20, x20, #16			LDUR x1,[x20,#0]	1
-		CMP x20, x22				LDUR x0,[x20,#8]	2
-		ADD x1, x1, x21				NOP			3
-		ADD x0, x0, x21				STUR x1, [x20, #16]	4
-		BGT Loop				STUR x0, [x20, #8]	5
+.....	ALU or branch instruction		Data transfer instruction 	clock cycle
+Loop:	SUBI x20, x20, #16				LDUR x1,[x20,#0]	1
+		CMP x20, x22					LDUR x0,[x20,#8]	2
+		ADD x1, x1, x21					NOP			3
+		ADD x0, x0, x21					STUR x1, [x20, #16]	4
+		BGT Loop						STUR x0, [x20, #8]	5
 
 
 

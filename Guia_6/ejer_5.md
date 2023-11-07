@@ -33,20 +33,50 @@ iniciación).
 
 A)
 
+**Respuesta:**
 
-Evaluación 	Valor 		GR 			Resultado
-j < 3 		j = 1 		1101 (TTNT) 		Taken
-j < 3 		j = 2 		1011 (TNTT) 		Taken
-j < 3 		j = 3 		0111 (NTTT) 		Not Taken
-i < 100 	i = 10 		1110 (TTTN) 		Taken
+La tabla de historial de patrones (PHT) para un predictor de saltos local de dos niveles con n=4 y m=4 es una matriz de 16x16. Cada entrada de la matriz representa un patrón de 4 bits de la dirección del salto y un valor de predicción.
 
+El código en ARMv8 dado tiene dos instrucciones de salto:
 
+* `L2: add x1, xzr, xzr`
+* `L1: …`
 
-GHR 	PC 	Resultado
-1101 	0100 	11
-1011 	0100 	11
-0111 	0100 	00
-1110 	0000 	11
+La dirección de la primera instrucción de salto es 0x04. La dirección de la segunda instrucción de salto es 0x08.
+
+El patrón de 4 bits para la primera instrucción de salto es 0001. El patrón de 4 bits para la segunda instrucción de salto es 0010.
+
+El valor de predicción para la primera instrucción de salto es "Taken". El valor de predicción para la segunda instrucción de salto es "Not Taken".
+
+Por lo tanto, la tabla de historial de patrones (PHT) quedaría de la siguiente forma:
+
+```
+0001: Taken
+0010: Not Taken
+```
+
+**Explicación:**
+
+El predictor de saltos local de dos niveles funciona de la siguiente manera:
+
+* En la etapa de fetch, el procesador busca el patrón de 4 bits de la dirección del salto en la tabla de historial de patrones (PHT).
+* Si el patrón se encuentra en la PHT, el procesador utiliza el valor de predicción almacenado en la entrada correspondiente.
+* Si el patrón no se encuentra en la PHT, el procesador utiliza el valor de predicción predeterminado.
+
+En este caso, el patrón de 4 bits de la primera instrucción de salto es 0001. Este patrón no se encuentra en la PHT, por lo que el procesador utiliza el valor de predicción predeterminado, que es "Taken".
+
+El patrón de 4 bits de la segunda instrucción de salto es 0010. Este patrón tampoco se encuentra en la PHT, por lo que el procesador utiliza el valor de predicción predeterminado, que es "Not Taken".
+
+**Conclusión:**
+
+La tabla de historial de patrones (PHT) quedaría de la siguiente forma:
+
+```
+0001: Taken
+0010: Not Taken
+```
+
+Esta tabla de historial de patrones es solo un ejemplo. La tabla real de historial de patrones variará en función del código que se ejecute.
 
 
 ----------------------------------------------------------------------------------------------------------------------
@@ -57,11 +87,11 @@ B)
 
 Para la comparación de la precisión, primero necesitamos entender cómo funciona un predictor de 2-bits. En un predictor de 2-bits, cada entrada en la tabla tendría dos bits para mantener el historial de predicciones (00, 01, 10, 11). Vamos a analizar cómo se comportaría este predictor en base a las evaluaciones proporcionadas en el primer punto.
 
-Evaluación 	Valor 	Predictor 		Resultado
-j < 3 		j = 1 	11 (Taken) 		Taken
-j < 3 		j = 2 	10 (Weakly Taken) 	Taken
+Evaluación 	Valor 	Predictor 				Resultado
+j < 3 		j = 1 	11 (Taken) 				Taken
+j < 3 		j = 2 	10 (Weakly Taken) 		Taken
 j < 3 		j = 3 	01 (Weakly Not Taken) 	Not Taken
-i < 100 	i = 10 	11 (Taken) 		Taken
+i < 100 	i = 10 	11 (Taken) 				Taken
 
 Ahora, comparemos las predicciones entre el predictor de 2-bits y el predictor de saltos local de dos niveles con n=4 y m=4:
 

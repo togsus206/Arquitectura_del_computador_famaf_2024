@@ -55,75 +55,61 @@ A)
 
 **Diagrama de pipeline**
 
-El diagrama de pipeline para la ejecución del código LEGv8 dado en un procesador de 2-issue se muestra a continuación:
+El diagrama de pipeline que muestra cómo se ejecuta el código LEGv8 dado en el procesador de 2-issue se muestra a continuación. El código se ha organizado para evitar la mayor cantidad posible de stalls.
 
 ```
-Iteración 1:
-
-Fase IF:
-	1> ADDI X0, XZR, #0x100
-3> LDUR X1, [X0,#0]
-
-Fase ID:
-	2> ADDI X10, XZR, #50
-
-Fase EX:
-	4> ADD X2, X2, X1
-
-Fase MEM:
-	5> LDUR X1, [X0,#8]
-6> SUBI X10, X10, #1
-
-Fase WB:
-	7> ADD X2, X2, X1
-
-Fase ID:
-	8> STUR X2, [X0,#8]
-9> ADDI X0, X0, #16
-
-Fase IF:
-	10> CBNZ X10, loop
+| Etapa | Instrucciones |
+|---|---|
+| IF | 1, 2 |
+| ID | 3, 5 |
+| EX | 4, 6 |
+| MEM | 7, 8 |
+| WB | 9, 10 |
 ```
 
-**Organización del código para evitar stalls**
+**Explicación**
 
-Para evitar la mayor cantidad posible de stalls, el compilador ha organizado el código de la siguiente manera:
-
-* Las instrucciones 1 y 3 se han colocado en el mismo paquete, ya que no hay dependencias entre ellas.
-* Las instrucciones 2 y 4 se han colocado en el mismo paquete, ya que no hay dependencias entre ellas.
-* La instrucción 5 se ha colocado en un paquete por sí misma, ya que requiere el resultado de la instrucción 3.
-* La instrucción 6 se ha colocado en un paquete por sí misma, ya que requiere el resultado de la instrucción 4.
-* La instrucción 7 se ha colocado en un paquete por sí misma, ya que requiere el resultado de la instrucción 5.
-
-**Cambios realizados en el código**
-
-Para cumplir con las restricciones del procesador, el compilador ha realizado los siguientes cambios en el código:
-
-* Se ha insertado una instrucción "nop" al final de la iteración del bucle, para que la instrucción "CBNZ" tenga un operando para la siguiente iteración.
+* **Etapa IF:** Las instrucciones 1 y 2 se cargan en la etapa IF.
+* **Etapa ID:** Las instrucciones 3 y 5 se cargan en la etapa ID.
+* **Etapa EX:** Las instrucciones 4 y 6 se ejecutan en la etapa EX.
+* **Etapa MEM:** Las instrucciones 7 y 8 se ejecutan en la etapa MEM.
+* **Etapa WB:** Las instrucciones 9 y 10 se ejecutan en la etapa WB.
 
 **Caminos de forwarding utilizados**
 
-Los caminos de forwarding utilizados para el código dado son los siguientes:
+* **Forwarding de datos:**
+    * En la etapa MEM, el resultado de la instrucción 3 se utiliza como operando de la instrucción 7.
+    * En la etapa MEM, el resultado de la instrucción 5 se utiliza como operando de la instrucción 6.
+* **Forwarding de control:**
+    * No se utiliza forwarding de control en este caso.
 
-* La instrucción 4 utiliza el resultado de la instrucción 3, que se ha obtenido en la fase MEM.
-* La instrucción 7 utiliza el resultado de la instrucción 5, que se ha obtenido en la fase WB.
+**Tabla**
 
-**Explicación de la ejecución**
+La siguiente tabla muestra cómo se ejecutan las instrucciones en el procesador de 2-issue.
 
-La ejecución del código en el procesador de 2-issue se explica a continuación:
+| Instrucción | Etapa |
+|---|---|
+| 1 | IF |
+| 2 | IF |
+| 3 | ID |
+| 5 | ID |
+| 4 | EX |
+| 6 | EX |
+| 7 | MEM |
+| 8 | MEM |
+| 9 | WB |
+| 10 | WB |
 
-* **Iteración 1:**
-    * Fase IF: Las instrucciones 1 y 3 se cargan en los paquetes de issue.
-    * Fase ID: Las instrucciones 1 y 3 se ejecutan y se colocan en los registros de resultado.
-    * Fase EX: La instrucción 4 se ejecuta y se coloca en el registro de resultado.
-    * Fase MEM: La instrucción 5 se ejecuta y se coloca en el registro de resultado.
-    * Fase WB: La instrucción 4 se escribe en el registro X2.
-    * Fase ID: La instrucción 7 se carga en el paquete de issue.
-    * Fase EX: La instrucción 6 se ejecuta y se coloca en el registro de resultado.
-    * Fase MEM: La instrucción 7 se ejecuta y se coloca en el registro de resultado.
-    * Fase WB: La instrucción 6 se escribe en el registro X10.
-    * Fase IF: La instrucción 10 se carga en el paquete de issue.
+**Análisis**
 
+El código se ha organizado de la siguiente manera para evitar la mayor cantidad posible de stalls:
+
+* **Las instrucciones 1 y 2 se cargan en la etapa IF primero para que puedan utilizarse como operandos de otras instrucciones.**
+* **Las instrucciones 3 y 5 se cargan en la etapa ID juntas para que puedan ejecutarse en la etapa EX en el mismo paquete.**
+* **Las instrucciones 4 y 6 se ejecutan en la etapa EX juntas para que puedan utilizar el resultado de las instrucciones 3 y 5.**
+* **Las instrucciones 7 y 8 se ejecutan en la etapa MEM juntas para que puedan utilizar el resultado de las instrucciones 4 y 6.**
+
+De esta manera, se pueden evitar los stalls de datos y de control.
 
 
 
@@ -178,104 +164,58 @@ C)
 
 
 
-**Explicación:**
+**Procesador de 1-issue**
 
-En un procesador de 2-issue, las instrucciones 1 y 2 se ejecutarán de la siguiente manera:
-
-```
-Iteración 1:
-
-Fase IF:
-	1> ADDI X0, XZR, #0x100
-
-Fase ID:
-	2> ADDI X10, XZR, #50
-
-Fase EX:
-	3> LDUR X1, [X0,#0]
-
-Fase MEM:
-	4> ADD X2, X2, X1
-
-Fase WB:
-	5> LDUR X1, [X0,#8]
-
-Fase IF:
-	6> SUBI X10, X10, #1
-
-Iteración 2:
-
-Fase ID:
-	7> ADD X2, X2, X1
-
-Fase EX:
-	8> STUR X2, [X0,#8]
-	9> ADDI X0, X0, #16
-
-Fase MEM:
-	10> CBNZ X10, loop
-```
-
-Como se puede ver, las instrucciones 1 y 2 se ejecutan en dos fases consecutivas del pipeline. Esto significa que el aumento de velocidad real será menor que el 30%.
-
-Para calcular el aumento de velocidad real, podemos usar la siguiente fórmula:
-
-
-Aumento de velocidad real = (1 - (Número de instrucciones de tipo aritmética/lógica / Número total de instrucciones)) * 50%
-
-
-En este caso, el número de instrucciones de tipo aritmética/lógica es de dos instrucciones por iteración del bucle. El número total de instrucciones es de diez instrucciones por iteración del bucle.
-
-Por lo tanto, el aumento de velocidad real es:
+En un procesador de 1-issue, cada instrucción se ejecuta en una etapa del pipeline. En este caso, el código se ejecutará de la siguiente manera:
 
 ```
-Aumento de velocidad real = (1 - (2 / 10)) * 50% = 30%
+| Etapa | Instrucciones |
+|---|---|
+| IF | 1, 2 |
+| ID | 3 |
+| EX | 4 |
+| MEM | 5 |
+| WB | 6 |
+| IF | 7, 8 |
+| ID | 9 |
+| EX | 10 |
+| MEM | 11 |
+| WB | 12 |
 ```
 
-**Conclusión:**
+**Procesador de 2-issue**
 
-El aumento de velocidad real en la ejecución del código dado al pasar de un procesador de 1-issue a un procesador de 2-issue es de aproximadamente el **30%**. Este aumento de velocidad se debe a que, en un procesador de 2-issue, se pueden ejecutar dos instrucciones en paralelo en las fases IF y ID.
+En un procesador de 2-issue, dos instrucciones se pueden ejecutar en dos etapas diferentes del pipeline en el mismo ciclo de reloj. En este caso, el código se ejecutará de la siguiente manera:
 
-La respuesta es **30%**, siempre y cuando no se pueda reordenar las instrucciones.
+```
+| Etapa | Instrucciones |
+|---|---|
+| IF | 1, 2 |
+| ID | 3, 5 |
+| EX | 4, 6 |
+| MEM | 7, 8 |
+| WB | 9, 10 |
+```
 
+**Aumento de velocidad**
 
+El aumento de velocidad en la ejecución del código dado al pasar de un procesador de 1-issue a un procesador de 2-issue es de un factor de 2. Esto se debe a que cada iteración del código se puede ejecutar en la mitad del tiempo en un procesador de 2-issue.
 
+**Explicación**
 
-Caso se puedan reordenar: 
+En un procesador de 1-issue, cada iteración del código se ejecuta en 12 ciclos de reloj. En un procesador de 2-issue, cada iteración del código se ejecuta en 6 ciclos de reloj. Por lo tanto, el aumento de velocidad es de 12 / 6 = 2.
 
+**Consideración de la totalidad de las iteraciones**
 
-Iteración 1:
+Si se consideran la totalidad de las iteraciones realizadas por el código, el aumento de velocidad será aún mayor. Esto se debe a que el procesador de 2-issue puede comenzar a ejecutar la siguiente iteración del código antes de que finalice la ejecución de la iteración actual.
 
-1. Fase IF:
-   - ADDI X0, XZR, #0x100
-   - LDUR X1, [X0,#0]
-  
-2. Fase ID:
-   - ADD X2, X2, X1
-
-3. Fase EX:
-   - ADDI X10, XZR, #50
-   - LDUR X1, [X0,#8]
-
-4. Fase MEM:
-   - SUBI X10, X10, #1
-
-5. Fase WB:
-   - ADD X2, X2, X1
-
-6. Fase IF:
-   - ADDI X0, X0, #16
-
-7. Fase ID:
-   - CBNZ X10, loop
-   - STUR X2, [X0,#8]
+El aumento de velocidad en la ejecución del código dado al pasar de un procesador de 1-issue a un procesador de 2-issue es de un factor de 2 o más, dependiendo de la cantidad de iteraciones que se ejecuten.
 
 ---------------------------------------------------------------------------------------------------------------------------
 
 
 D)
 
-Tienes razón, cometí un error en mi respuesta anterior. Las instrucciones 7, 9 y 10 no son instrucciones LDUR. Las instrucciones LDUR son las que cargan datos desde memoria. Permíteme corregir mi respuesta y proporcionar la información precisa.
 
 En el código original, las instrucciones LDUR son las siguientes:
 
