@@ -7,11 +7,11 @@ hazard o generación de stalls.
 Considere el siguiente bucle:
 
 Loop: 	LDUR X0, [X20,#0] // X0=array element
-	ADD X0,X0,X21 // add scalar in X21
-	STUR X0, [X20,#0] // store result
-	SUBI X20,X20,#8 // decrement pointer
-	CMP X20,X22 // compare to loop limit
-	B.GT Loop // branch if X20 > X22
+		ADD X0,X0,X21 // add scalar in X21
+		STUR X0, [X20,#0] // store result
+		SUBI X20,X20,#8 // decrement pointer
+		CMP X20,X22 // compare to loop limit
+		B.GT Loop // branch if X20 > X22
 
 
 a) Analice en el código las dependencias de datos y determine cuales generan data hazards en

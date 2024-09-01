@@ -15,16 +15,16 @@ instrucciones “nop” para que el código se ejecute sin necesidad de generaci
 
 Para el siguiente fragmento de código LEGv8 (donde X2 = 0):
 
-	1> ADDI X0, XZR, #0x100
-	2> ADDI X10, XZR, #50
+		1> ADDI X0, XZR, #0x100
+		2> ADDI X10, XZR, #50
 loop: 	3> LDUR X1, [X0,#0]
-	4> ADD X2, X2, X1
-	5> LDUR X1, [X0,#8]
-	6> SUBI X10, X10, #1
-	7> ADD X2, X2, X1
-	8> STUR X2, [X0,#8]
-	9> ADDI X0, X0, #16
-	10> CBNZ X10, loop
+		4> ADD X2, X2, X1
+		5> LDUR X1, [X0,#8]
+		6> SUBI X10, X10, #1
+		7> ADD X2, X2, X1
+		8> STUR X2, [X0,#8]
+		9> ADDI X0, X0, #16
+		10> CBNZ X10, loop
 	
 	
 a. Dibuje un diagrama de pipeline que muestre cómo se ejecuta el código LEGv8 dado en el
@@ -138,15 +138,14 @@ loop:
 Podemos observar las siguientes dependencias de datos:
 
 - Instrucción 4 depende de la instrucción 3.
-- Instrucción 5 depende de la instrucción 4.
-- Instrucción 7 depende de la instrucción 6.
+- Instrucción 5 depende de la instrucción 4. ------» no es necesario forwarding
 - Instrucción 8 depende de la instrucción 7.
-- Instrucción 10 depende de la instrucción 6.
+- Instrucción 10 depende de la instrucción 6. ------» no es necesario forwarding
 
 Dado que el procesador es de 2-issue y en cada issue packet debe haber una instrucción de acceso a memoria y otra de tipo aritmética/lógica o un salto, podemos identificar las siguientes dependencias importantes:
 
 - Para la instrucción 4 (ADD X2, X2, X1), necesitamos reenviar el resultado de la instrucción 3 (LDUR X1, [X0,#0]) desde la etapa MEM.
-- Para la instrucción 7 (ADD X2, X2, X1), necesitamos reenviar el resultado de la instrucción 5 (LDUR X1, [X0,#8]) desde la etapa MEM.
+- Para la instrucción 7 (ADD X2, X2, X1), necesitamos reenviar el resultado de la instrucción 5 (LDUR X1, [Xs0,#8]) desde la etapa MEM.
 
 Basándonos en estas dependencias, es más efectivo reenviar desde el registro MEM/WB (MEM → EX) para resolver las dependencias de datos. Esto garantiza que las instrucciones 4 y 7 puedan recibir los datos que necesitan para ejecutarse correctamente, ya que estos datos estarán disponibles en la etapa MEM y se reenviarán a la etapa EX.
 
