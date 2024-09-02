@@ -18,6 +18,8 @@ module ejer13 (output logic [15:0] c, input logic reset, clk);
   end
 endmodule
 
+
+SOLUCION: A
 /*
 Compilar el codigo del ejercicio
 luego ir a Tools-> Netlist Viewer -> RTL viewer

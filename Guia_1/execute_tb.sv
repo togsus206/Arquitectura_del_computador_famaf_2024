@@ -19,10 +19,9 @@ module execute_tb();
 	//output 1 bit
 	.zero_E(zero_E));
 
-	int errors, yey;
+	int errors;
 	initial begin
 		errors= 0;
-		yey = 0;
 		signImm_E = 64'hFF0_0000_0000_0000F;
 		//chequear sr2_result
 		#5ns;

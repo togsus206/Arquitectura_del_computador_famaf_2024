@@ -5,7 +5,7 @@ module ejer12 (input logic Clk, ShiftIn, load, ShiftEn,
 					output logic [3:0] RegContent);
 					
 		logic [3:0] shift_reg;
-		always_ff @(posedge Clk)
+		always_ff @(posedge Clk) BEGIN(ESTARIA FALTANDO)
 			if(load)
 				shift_reg <= ParallelIn;
 			else if (ShiftEn)
@@ -13,8 +13,8 @@ module ejer12 (input logic Clk, ShiftIn, load, ShiftEn,
 		end
 		
 		begin
-			______________________ ___________ shift_reg[3];
-			RegContent ________________ shift_reg;
+			_________shifout_____________ ______«=_____ shift_reg[3];
+			RegContent __________«=______ shift_reg;
 		end
 
 endmodule
