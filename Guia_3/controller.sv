@@ -1,21 +1,22 @@
 // CONTROLLER
 
 module controller(input logic [10:0] instr,
-                   input logic ExtIRQ,  // Input for external interrupt
-                   output logic [3:0] AluControl,
-                   output logic reg2loc, regWrite, AluSrc, Branch,
+                  input logic ExtIRQ,  // Input for external interrupt
+                  input logic ExtAck,  // Input for external ACK
+                  input logic reset,   // Agregado el reset
+                  output logic [3:0] AluControl,
+                  output logic reg2loc, regWrite, [1:0] AluSrc, Branch,
                                   memtoReg, memRead, memWrite,
-                   output logic Exc,
-                   output logic [1:0] EStatus,
-                   output logic ExtIAck);  // Output for ExtIAck
-
+                  output logic Exc,   // Agregado
+                  output logic [3:0] EStatus, // Agregado
+                  output logic ERet,
+                  output logic ExtIAck); // Agregado
+                  
     logic [1:0] AluOp_s;
     logic NotAnInstr;
-	 logic [4:0] Rn;  // Added for BR instruction
 
-    // Instantiate maindec and aludec modules
     maindec decPpal (.Op(instr),
-                     .reset(1'b0),  // Assuming reset is not included here
+                     .reset(reset),  // Pasando el reset
                      .Reg2Loc(reg2loc),
                      .ALUSrc(AluSrc),
                      .MemtoReg(memtoReg),
@@ -24,57 +25,58 @@ module controller(input logic [10:0] instr,
                      .MemWrite(memWrite),
                      .Branch(Branch),
                      .ALUOp(AluOp_s),
-                     .NotAnInstr(NotAnInstr),  // Pass NotAnInstr to maindec
-							.Rn(Rn));  // Pass Rn to maindec
-
-    aludec decAlu (.funct(instr),
-                   .aluop(AluOp_s),
+                     .NotAnInstr(NotAnInstr));
+                     
+    aludec decAlu (.funct(instr), 
+                   .aluop(AluOp_s), 
                    .alucontrol(AluControl));
-		
-    // Assign EStatus based on the instruction type
-    // Assign EStatus based on the instruction type
-	always_comb begin
-		case (instr)
-			11'b1??_0101_?000: // R-type
-					EStatus = 2'b0000;
-        
-			11'b111_1100_0010: // LDUR
-					EStatus = 2'b0000;
-        
-			11'b111_1100_0000: // STUR
-					EStatus = 2'b0000;
-        
-			11'b101_1010_0???: // CBZ
-					EStatus = 2'b0000;
-        
-			11'b11010110100: // ERET
-					EStatus = 2'b0000;
-        
-			11'b11010101001: // MRS
-					EStatus = 2'b0000;
-			// Add a case for the BR instruction
-			11'b11010110000:
-					EStatus = 2'b0000;
-			//// Invalid OpCode
-			11'b???00000??0:
-					EStatus = 2'b0010;
-        
-			default: // External IRQ
-					EStatus = 2'b0001;
-		endcase
-	 end
+                   
+    // Un solo bloque always_comb para manejar el reset y las señales
+    always_comb begin
+        if (reset) begin
+            // Todas las salidas se ponen a 0 si reset está activo
+            AluControl = 4'b0000;
+            reg2loc = 0;
+            regWrite = 0;
+            AluSrc = 2'b00;
+            Branch = 2'b00;
+            memtoReg = 0;
+            memRead = 0;
+            memWrite = 0;
+            EStatus = 4'b0000;
+            Exc = 0;
+            ExtIAck = 0;
+        end else begin
+            // Asignar EStatus basado en la instrucción
+            case (instr)
+                11'b1??_0101_?000: // R-type
+                    EStatus = 4'b0000;
+                11'b111_1100_0010: // LDUR
+                    EStatus = 4'b0000;
+                11'b111_1100_0000: // STUR
+                    EStatus = 4'b0000;
+                11'b101_1010_0???: // CBZ
+                    EStatus = 4'b0000;
+                11'b11010110100:  // ERET
+                    EStatus = 4'b0000;
+                11'b11010101001:  // MRS
+                    EStatus = 4'b0000;
+                11'b11010110000:  // BR
+                    EStatus = 4'b0000;
+                11'b???00000??0:  // Invalid OpCode
+                    EStatus = 4'b0010;
+                default: // External IRQ
+                    EStatus = 4'b0001;
+            endcase
+            
+            // Exc es el resultado de OR entre ExtIRQ y NotAnInstr
+            Exc = ExtIRQ | NotAnInstr;
 
-	 
-    // Exc is the result of OR operation between ExtIRQ and NotAnInstr
-    assign Exc = ExtIRQ | NotAnInstr;
-	 // Logic for Exc
-    //always_ff @(posedge ExtIRQ) begin
-    //    Exc <= ExtIRQ | NotAnInstr;
-    //end
-
-    // ExtIAck is '1' when Exc is '1' and ExtIRQ is '1', else '0'
-    assign ExtIAck = (Exc && ExtIRQ) ? 1'b1 : 1'b0;
-	 
+            // ExtIAck es '1' cuando Exc es '1' y ExtIRQ es '1'
+            ExtIAck = (Exc && ExtIRQ) ? 1'b1 : 1'b0;
+        end
+    end
 endmodule
+
 
 
