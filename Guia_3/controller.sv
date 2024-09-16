@@ -1,5 +1,6 @@
 // CONTROLLER
 
+
 module controller(input logic [10:0] instr,
                   input logic ExtIRQ,  // Input for external interrupt
                   input logic ExtAck,  // Input for external ACK
@@ -65,10 +66,13 @@ module controller(input logic [10:0] instr,
                     EStatus = 4'b0000;
                 11'b???00000??0:  // Invalid OpCode
                     EStatus = 4'b0010;
-                default: // External IRQ
-                    EStatus = 4'b0001;
+                default: 
+                    EStatus = 4'b0000;
             endcase
             
+			// External IRQ
+			if(ExtIRQ) EStatus <= 4'b0001;
+				
             // Exc es el resultado de OR entre ExtIRQ y NotAnInstr
             Exc = ExtIRQ | NotAnInstr;
 
@@ -77,6 +81,3 @@ module controller(input logic [10:0] instr,
         end
     end
 endmodule
-
-
-
