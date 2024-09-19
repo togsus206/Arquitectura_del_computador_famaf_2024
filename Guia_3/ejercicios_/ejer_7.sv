@@ -21,7 +21,7 @@ esr_end:	eret
 
 esr_address:
     mrs x9, S2_0_C2_C0_0       // Obtiene el valor del registro ESR_EL1
-    subis xzr, x9, #0x020000      // Compara con 1 (indicando excepción por OpCode inválido)
+    subis xzr, x9, #0x02      // Compara con 1 (indicando excepción por OpCode inválido)
     b.ne esr_end            // Salta si no es igual (no es una excepción por OpCode inválido)
     mrs x0, S2_0_C1_C0_0   // Obtiene el valor de S2_0_C1_C0_0
     add x10, x0, xzr        // Calcula x10 como x0 + xzr (argumento: dirección del OpCode inválido)

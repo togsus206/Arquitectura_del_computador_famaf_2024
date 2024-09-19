@@ -28,8 +28,9 @@ c) Los registros de excepción son utilizados típicamente en la ISR o ESR (Inte
 /Exception Service Routine) para poder procesar debidamente el evento ocurrido.
 
 
-V (Verdadero). Los registros de excepción contienen información vital 
-sobre la excepción para que la ISR pueda manejarla adecuadamente.
+V (Verdadero). 
+
+Los registros de excepción, como el ESR_EL1 (Exception Syndrome Register) y el ELR_EL1 (Exception Link Register), son utilizados durante la ejecución de las rutinas de servicio de interrupción (ISR) o de excepción (ESR) para proporcionar información sobre la excepción o interrupción que ocurrió.
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -52,7 +53,9 @@ la excepción.
 
 
 
-F (Falso). El registro ESR (Exception Syndrome Register) suele 
+F (Falso). 
+
+El registro ESR (Exception Syndrome Register) suele 
 contener información sobre la causa y el tipo de excepción que 
 ocurrió, pero no necesariamente la dirección de memoria de la 
 instrucción en ejecución en el momento de la excepción
@@ -61,7 +64,9 @@ instrucción en ejecución en el momento de la excepción
 
 f) Si un procesador no reconoce una instrucción se genera un evento de excepción.
 
-V (Verdadero). Cuando un procesador encuentra una instrucción que no 
+V (Verdadero). 
+
+Cuando un procesador encuentra una instrucción que no 
 puede reconocer o interpretar  puede generar un evento de excepción,
  específicamente una excepción de tipo "Instrucción ilegal" o similar. 
 

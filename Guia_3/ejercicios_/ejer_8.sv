@@ -48,7 +48,7 @@ jmp1: 			subis xzr, x9, 0x02
 	        	movz x9, #0x8B1F03FF, lsl #16
 				movk x9, #0x03FF, lsl #0
 	        	mrs x10, s2_0_c1_c0_0
-				sturw x9,[x10, #0]
+				sturw w9,[x10, #0]
 				br x10
 exc_trap: 		b exc_trap
 

@@ -20,6 +20,7 @@
 /*
 verdadera. Descripción:Las asignaciones son simples y no hay desplazamiento. El valor de y1 es actualizado con x1, y z1 toma el valor de y1.
 Registro en paralelo ya que se usa "<=" que no es bloqueante
+
 */
 
 //c) La línea 6 implementa un registro de desplazamiento (shift register).
