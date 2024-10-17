@@ -12,7 +12,7 @@ Incorrecta. Mayor capacidad no implica necesariamente menor tiempo de acceso. El
 
 d. A mayor tiempo de acceso, mayor capacidad.
 
-Incorrecta. El tiempo de acceso y la capacidad no están directamente relacionados. Es posible tener memorias con alta capacidad y tiempos de acceso bajos si se utilizan tecnologías adecuadas.
+Verdadera. Por el triangulo que se muestra al inicio de la guia 
 
 e. A mayor frecuencia de acceso, menor capacidad y mayor coste por bit.
 

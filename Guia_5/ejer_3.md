@@ -5,31 +5,47 @@ tamaño de bloque de 4 palabras de 32 bits c/u. Asuma direcciones de 64 bits
 
 -----------------------------------------------------------------------------------------------------------------
 
-Dado que estamos considerando una caché de mapeo directo, separamos cada dirección en tres partes: etiqueta, índice y desplazamiento.
 
-1. **Tamaño de la caché (en bytes)**:
-   - Tamaño de la caché = 16 KiB
-   - Tamaño de bloque = 4 palabras de 32 bits cada una = 4 * 32 bits = 128 bits = 16 bytes
-   - Entonces, el número de bloques en la caché = Tamaño de la caché / Tamaño de bloque = 16 KiB / 16 bytes = 1 Ki bloques.
+### Datos del ejercicio:
+- **Tamaño de la caché (datos):** 16 KiB = 16 x 1024 = 16,384 bytes.
+- **Tamaño del bloque:** 4 palabras de 32 bits cada una:
 
-2. **Número de bits para el índice**:
-   - Como hay 1 Ki bloques, necesitamos log₂(1 Ki) bits para el índice.
-   - log₂(1 Ki) = log₂(2^10) = 10 bits para el índice.
+  	4x32 bit cada palabra = 128 bits = 16bytes
+  	
+- **Número de bloques en la caché:** El número total de bloques es el tamaño total de la caché dividido por el tamaño del bloque:
+  16384 bytes/ 16 byes por bloque = 1024 lineas 
 
-3. **Número de bits para el desplazamiento**:
-   - Cada bloque tiene 16 bytes, lo que requiere log₂(16) = 4 bits para el desplazamiento.
+### Cálculo de los campos de la dirección de 64 bits:
 
-4. **Número de bits para la etiqueta**:
-   - La longitud total de la dirección es de 64 bits.
-   - Bits para el índice y el desplazamiento: 10 (índice) + 4 (desplazamiento) = 14 bits.
-   - Por lo tanto, bits para la etiqueta = Longitud total de la dirección - Bits para el índice y el desplazamiento = 64 - 14 = 50 bits.
+- **Offset dentro del bloque:** Como el tamaño de cada palabra dentro del bloque es de 32 bits = 4 bytes, necesitamos 2 bits para direccionar el offset
 
-Ahora, calculamos el tamaño total de la caché en bits considerando la cantidad de bloques y los bits necesarios para el índice, desplazamiento y etiqueta:
+- **Palabras dentro del bloque:** Sabemos que hay 4 palabras dentro de cada bloque, por lo que necesitamos 2 bits para direccionar que palabra buscamos
 
-- Tamaño total de la caché (en bits) = Número de bloques * (Bits para índice + Bits para desplazamiento + Bits para etiqueta)
-- Tamaño total de la caché (en bits) = 1 Ki bloques * (10 bits + 4 bits + 50 bits)
-- Tamaño total de la caché (en bits) = 1 Ki bloques * 64 bits
-- Tamaño total de la caché (en bits) = 1 Ki * 64 bits
-- Tamaño total de la caché (en bits) = 64 Ki bits
+- **Índice:** Hay 1024 bloques en la caché, por lo que necesitamos log_2(1024) = 10 bits para seleccionar el índice de la caché.
 
-Entonces, el tamaño total de la caché de mapeo directo es de 64 Ki bits.
+- **Etiqueta:** La etiqueta utiliza los bits restantes de la dirección de 64 bits. Entonces, el tamaño de la etiqueta será:
+  
+  Etiqueta = 64 - bits de offset + bits de índice = 64 - (2 + 2 + 10) = 50
+  
+
+### Cálculo del tamaño total de la caché:
+
+- **Tamaño de los datos:** La caché tiene 16,384 bytes (16 KiB) de datos, lo que equivale a 16,384 X 8 = 131,072 bits
+
+- **Tamaño de las etiquetas:** Cada entrada de la caché tiene una etiqueta de 50 bits. Como hay 1024 bloques, el tamaño total de las etiquetas será:
+  
+  50bits x 1024 bloques = 51,200 bits
+  
+- **Bits de control:** Normalmente hay un bit de "validación" (y en algunos casos, bits adicionales como para coherencia). Asumamos que hay solo 1 bit de control por bloque, entonces:
+  
+  1 bit de control x 1024 bloques = 1,024 bits
+
+### Tamaño total de la caché:
+
+El tamaño total será la suma de los bits de datos, etiquetas y control:
+
+tamaño total = 131.072 bits + 51200 bits + 1024 bits = 183,296 bits
+ 
+### Respuesta final:
+El tamaño total de la caché es de **183,296 bits**, equivalente a 2**10 x (50(tag)+ 1(bit de validez)+128(palabras por linea(cada una de 32 bit)))
+

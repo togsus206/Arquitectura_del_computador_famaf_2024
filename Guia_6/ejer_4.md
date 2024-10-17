@@ -29,27 +29,53 @@ método 2-Bit?
 A) 
 
 
-Para calcular los Ciclos por Instrucción (CPI) extras debidos a los fallos de predicción del método Always-Taken, primero necesitamos entender cómo afectan los fallos de predicción a la ejecución del programa y luego calcular la cantidad de ciclos adicionales por cada tipo de instrucción.
+Para resolver este ejercicio, sigamos un proceso paso a paso y usemos la información que se nos da sobre las instrucciones y las predicciones de salto.
 
-El método Always-Taken predice que todas los saltos serán tomados. Por lo tanto, si una instrucción de salto resulta no ser tomada, habrá un fallo de predicción y se producirán ciclos extras.
+### Paso 1: Identificar la cantidad de instrucciones que involucran saltos
 
-Dada la distribución de instrucciones, se nos dice que el 25% de las instrucciones son de tipo CBZ/CBZN (instrucciones de salto condicional). Si suponemos que todas estas instrucciones son Always-Taken y resultan en fallos de predicción (ya que el método Always-Taken predice que todas los saltos son tomados), calcularemos los CPI extras para este caso.
+La tabla de distribución de instrucciones dinámicas indica lo siguiente:
 
-La fórmula para calcular los CPI extras debido a los fallos de predicción es:
+- R-type: 40%
+- **CBZ/CBZN (instrucciones de salto condicional)**: 25%
+- B (instrucciones de salto incondicional): 5%
+- LDUR: 25%
+- STUR: 5%
+
+De estas instrucciones, las instrucciones **CBZ/CBZN** son las relevantes para el predictor de salto, ya que son condicionales. En total, representan el 25% del total de instrucciones.
+
+### Paso 2: Analizar el método Always-Taken
+
+Se nos dice que el predictor "Always-Taken" tiene una precisión del **45%**. Esto significa que el **55%** de las veces, este predictor falla en predecir correctamente el resultado del salto.
+
+Cuando falla, se produce una penalización en términos de ciclos adicionales, ya que el salto no se predice correctamente. Según el enunciado, la predicción se hace en la etapa de decodificación (ID), pero el salto se aplica en la etapa de ejecución (EX). Esto implica un retraso de **1 ciclo** debido al fallo de predicción.
+
+### Paso 3: Calcular los CPI adicionales debidos a los fallos de predicción
+
+Dado que las instrucciones de salto **CBZ/CBZN** representan el 25% del total de instrucciones, el impacto de los fallos de predicción debe basarse en este porcentaje.
+
+#### Fórmula para calcular los CPI adicionales:
+
+CPI extras} = Frecuencia de saltos x Tasa de fallo xPenalización por fallo
 
 
-CPI extras = Frecuencia de fallos de predicción * (Ciclos extra por fallo/precicion del metodo del predictor de salto)
+Donde:
+- Frecuencia de saltos = 25% (0.25) (instrucciones **CBZ/CBZN**)
+- Tasa de fallo del predictor Always-Taken = 55% (0.55)
+- Penalización por fallo = 1 ciclo (por cada fallo)
 
-En este caso, la frecuencia de fallos de predicción es igual a la frecuencia de las instrucciones CBZ/CBZN, que es el 25% y Always-Taken tiene una presicion del 45%
+Sustituyendo los valores:
 
-El número de ciclos extra por fallo para el método Always-Taken es 1, ya que si la predicción Always-Taken es incorrecta, se producirá un fallo de predicción y se perderá un ciclo.
 
-Por lo tanto, los CPI extras debido a los fallos de predicción del método Always-Taken son:
+CPI extras = 0.25 x 0.55 x 3 = 0.4125
 
-CPI extras = 25% (frecuencia de instrucciones CBZ/CBZN) * 1 (ciclo extra por fallo)/45%
-            = 0.5556 ciclos extras por instrucción
 
-Esto significa que, en promedio, se producen 0.5556 ciclos extras por instrucción debido a los fallos de predicción del método Always-Taken.
+### Resultado:
+
+Los **CPI extras** debidos a los fallos de predicción del método "Always-Taken" son **0.1375**.
+
+Este es el número de ciclos adicionales por instrucción en promedio, debido a los fallos de predicción de salto en las instrucciones **CBZ/CBZN** cuando se usa el método Always-Taken.
+
+Si tienes más preguntas o necesitas algún ajuste, házmelo saber.
 	
 
 -----------------------------------------------------------------------------------------------------------------------
@@ -57,9 +83,7 @@ Esto significa que, en promedio, se producen 0.5556 ciclos extras por instrucci�
 
 B)
 
-
-CPI extras = 25% (frecuencia de instrucciones CBZ/CBZN) * 1 (ciclo extra por fallo)/55%
-            = 0.4545 ciclos extras por instrucción
+CPI extras = 0.25 x 0.45 x 3 = 0.4125
 
 
 ----------------------------------------------------------------------------------------------------------------
@@ -68,9 +92,7 @@ CPI extras = 25% (frecuencia de instrucciones CBZ/CBZN) * 1 (ciclo extra por fal
 C)
 
 
-CPI extras = 25% (frecuencia de instrucciones CBZ/CBZN) * 1 (ciclo extra por fallo)/85%
-            = 0.2941 ciclos extras por instrucción
-
+CPI extras = 0.25 x 0.15 x 3 = 0.1125
 
 
 

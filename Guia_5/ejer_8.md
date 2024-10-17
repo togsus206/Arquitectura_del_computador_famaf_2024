@@ -13,58 +13,81 @@ c. Memoria caché con función de correspondencia asociativa de 8 vías.
 
 ----------------------------------------------------------------------------------------
 
-A)
+¡Vamos con el último ejercicio! Para resolverlo, partimos de la información clave:
 
+- **Memoria principal**: 1M palabras (2^20 palabras).
+- **Bloques de memoria**: 4K bloques (2^12 bloques).
+- **Caché**: 64 líneas.
 
-En una memoria caché con función de correspondencia directa, cada línea de la caché está asociada con un único bloque de memoria principal. Por lo tanto, el formato de la dirección de memoria principal se compone de dos partes:
+Cada palabra en la memoria es direccionable, por lo que las direcciones de memoria tendrán 20 bits (ya que 2^20 = 1M).
 
-Etiqueta: identifica de forma única el bloque de memoria principal en la caché.
-Offset: identifica la palabra dentro del bloque de memoria principal.
-En este caso, la memoria principal tiene 1M palabras, que equivalen a 2^20 bits. Los bloques de memoria principal tienen 4K palabras, que equivalen a 2^12 bits.
+### a. **Memoria caché con correspondencia directa**
 
-Por lo tanto, el tamaño de la etiqueta es de 20 bits, ya que es necesario para identificar de forma única un bloque de memoria principal en la caché. El tamaño del offset es de 12 bits, ya que es necesario para identificar la palabra dentro del bloque de memoria principal.
+En una **correspondencia directa**, cada bloque de la memoria principal puede estar mapeado en una única línea de la caché. La dirección de memoria se divide en:
 
-Por lo tanto, el formato de la dirección de memoria principal es el siguiente:
+1. **Offset de bloque**: No se especifica el tamaño del bloque en el enunciado, pero al tener 4K bloques y 1M palabras, sabemos que cada bloque contiene 2^20 / 2^12 = 2^8 palabras. Esto implica que necesitamos **8 bits** para el **offset de palabra dentro del bloque**.
 
-| Etiqueta (20 bits) | Offset (12 bits) |
+2. **Índice de línea**: La caché tiene 64 líneas, lo que significa que necesitamos **6 bits** para el **índice de línea** (ya que 64 = 2^6).
 
+3. **Etiqueta (Tag)**: Los bits restantes se usan como la etiqueta. Como tenemos una dirección de 20 bits en total y ya hemos usado 8 bits para el offset y 6 bits para el índice, los restantes 6 bits son para la **etiqueta**.
 
--------------------------------------------------------------------------------------------------------------
+Por lo tanto, el formato de la dirección para la correspondencia directa es:
+- **Tag**: 6 bits
+- **Índice**: 6 bits
+- **Offset**: 8 bits
 
-B)
+---
 
+### b. **Memoria caché con correspondencia full-asociativa**
 
-En una memoria caché con función de correspondencia full-asociativa, cualquier bloque de memoria principal puede almacenarse en cualquier línea de la caché. Por lo tanto, el formato de la dirección de memoria principal se compone de una sola parte:
+En una **correspondencia full-asociativa**, cualquier bloque de la memoria principal puede ser mapeado a cualquier línea de la caché. Por lo tanto, no necesitamos un índice para las líneas, ya que no se asigna a ninguna línea en particular.
 
-Etiqueta: identifica de forma única el bloque de memoria principal en la caché.
-En este caso, la memoria principal tiene 1M palabras, que equivalen a 2^20 bits. Los bloques de memoria principal tienen 4K palabras, que equivalen a 2^12 bits.
+1. **Offset de bloque**: Al igual que antes, el **offset** sigue siendo de **8 bits** (ya que cada bloque tiene 256 palabras).
 
-Por lo tanto, el tamaño de la etiqueta es de 20 bits, ya que es necesario para identificar de forma única un bloque de memoria principal en la caché.
+2. **Etiqueta (Tag)**: El resto de los bits de la dirección se usan para la etiqueta. Como no hay índice de línea, los 12 bits restantes se asignan a la **etiqueta**.
 
-Por lo tanto, el formato de la dirección de memoria principal es el siguiente:
+Por lo tanto, el formato de la dirección para la correspondencia full-asociativa es:
+- **Tag**: 12 bits
+- **Offset**: 8 bits
 
-| Etiqueta (20 bits) |
+---
 
-- **Índice:** No se aplica en una caché full-asociativa
-- **Desplazamiento:** No se aplica en una caché full-asociativa
+### c. **Memoria caché con correspondencia asociativa de 8 vías**
 
---------------------------------------------------------------------------------------------------------------------------------
+En una **correspondencia asociativa de 8 vías**, la caché se divide en conjuntos, y cada conjunto tiene 8 vías (es decir, 8 líneas por conjunto). Como la caché tiene 64 líneas y cada conjunto tiene 8 líneas, tenemos 64 / 8 = 8 conjuntos.
 
-C)
+1. **Offset de bloque**: Igual que en los casos anteriores, necesitamos **8 bits** para el **offset de palabra dentro del bloque**.
 
+2. **Índice de conjunto**: Tenemos 8 conjuntos, lo que implica que necesitamos **3 bits** para el **índice del conjunto** (ya que 8 = 2^3).
 
-En una memoria caché con función de correspondencia asociativa de 8 vías, cualquier bloque de memoria principal puede almacenarse en cualquiera de las 8 líneas de la caché. Por lo tanto, el formato de la dirección de memoria principal se compone de tres partes:
+3. **Etiqueta (Tag)**: Los bits restantes se usan para la etiqueta. Dado que la dirección tiene 20 bits, y ya hemos usado 8 bits para el offset y 3 bits para el índice, nos quedan **9 bits** para la **etiqueta**.
 
-Conjunto: identifica el conjunto de la caché que contiene el bloque de memoria principal correspondiente.
-Vía: identifica la línea de caché específica dentro del conjunto.
-Etiqueta: identifica el bloque de memoria principal dentro del conjunto.
-En este caso, la memoria principal tiene 1M palabras, que equivalen a 2^20 bits. Los bloques de memoria principal tienen 4K palabras, que equivalen a 2^12 bits.
+Por lo tanto, el formato de la dirección para la correspondencia asociativa de 8 vías es:
+- **Tag**: 9 bits
+- **Índice**: 3 bits
+- **Offset**: 8 bits
 
-Por lo tanto, el tamaño del conjunto es de 20 bits, ya que es necesario para identificar de forma única un conjunto de la caché. El tamaño de la vía es de 3 bits(ya que son 8 vias 2**3), ya que es necesario para identificar de forma única una línea de caché dentro de un conjunto. El tamaño de la etiqueta es de 20 bits, ya que es necesario para identificar de forma única un bloque de memoria principal dentro de un conjunto.
+---
 
-Por lo tanto, el formato de la dirección de memoria principal es el siguiente:
+### Resumen de las respuestas:
 
-| Conjunto (20 bits) | Vía (3 bits) | Etiqueta (20 bits) |
+a. Para **correspondencia directa**:
+   - Tag: 6 bits
+   - Índice: 6 bits
+   - Offset: 8 bits
+
+b. Para **correspondencia full-asociativa**:
+   - Tag: 12 bits
+   - Offset: 8 bits
+
+c. Para **correspondencia asociativa de 8 vías**:
+   - Tag: 9 bits
+   - Índice: 3 bits
+   - Offset: 8 bits
+
+---
+
+¡Eso sería todo! Si tienes alguna duda o si algún detalle no está claro, aquí estoy para ayudarte.
 
 
 

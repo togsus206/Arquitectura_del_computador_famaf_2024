@@ -10,97 +10,83 @@ c. ¿Cuántos bits hay en cada línea de la memoria caché y cómo se dividen se
 
 --------------------------------------------------------------------------------------------------------
 
-** A) 
 
-**Solución:**
+- **Memoria principal**: 64K bytes.
+- **Memoria caché**: 1K bits.
+- **Tamaño de línea de caché**: 4 palabras de 16 bits cada una.
 
-**a. Determinación del número de bits para los diferentes campos de la dirección**
+### Paso preliminar: Datos iniciales
 
-Para determinar el número de bits para los diferentes campos de la dirección, se procede de la siguiente manera:
+- **Palabra**: Cada palabra tiene 16 bits (\(2\) bytes).
+- **Bloque de caché**: Un bloque contiene **4 palabras** de 16 bits, por lo tanto, cada bloque es de **64 bits** (\(4 \, \text{palabras} \times 16 \, \text{bits}\)).
+  
+### a) ¿Cuántos bits hay en los diferentes campos del formato de dirección de memoria principal?
 
-* **Tamaño de la memoria principal:** 64K bytes = 64K * 8 bits/byte = 512K bits
-* **Tamaño de la caché:** 1K bits
-* **Tamaño de la línea de caché:** 4 palabras * 16 bits/palabra = 64 bits
+#### 1. **Offset de palabra (Word Offset)**:
+Cada línea de la caché contiene **4 palabras**. Para seleccionar una palabra dentro de una línea, necesitamos \( \log_2(4) = 2 \, \text{bits} \) para el **offset de palabra**.
 
-**Cálculo del número de bits para la etiqueta:**
+#### 2. **Offset de byte (Byte Offset)**:
+Cada palabra tiene **2 bytes** (16 bits). Para seleccionar un byte dentro de una palabra, necesitamos \( \log_2(2) = 1 \, \text{bit} \) para el **offset de byte**.
 
-```
-Número de bits para la etiqueta = Tamaño de la memoria principal / Tamaño de la caché
-```
+#### 3. **Índice (Index)**:
+La memoria caché tiene un tamaño total de **1K bits**, lo que equivale a \( \frac{1024}{64} = 16 \, \text{líneas} \) en la caché, dado que cada línea tiene **64 bits**. Por lo tanto, necesitamos \( \log_2(16) = 4 \, \text{bits} \) para el **índice**.
 
-```
-Número de bits para la etiqueta = 512K bits / 1K bits = 512
-```
+#### 4. **Etiqueta (Tag)**:
+La memoria principal tiene **64K bytes**, lo que equivale a \(64 \times 1024 = 65536 \, \text{bytes}\). Como cada palabra tiene 2 bytes, hay \( \frac{65536}{2} = 32768 \, \text{palabras}\). Entonces, se requieren \( \log_2(32768) = 15 \, \text{bits} \) para direccionar todas las palabras de la memoria principal.
 
-**Cálculo del número de bits para el índice:**
+Ya hemos asignado 4 bits al índice, 2 bits al **offset de palabra**, y 1 bit al **offset de byte**. Por lo tanto, los **8 bits restantes** (de los 15 necesarios) son para la **etiqueta**.
 
-```
-Número de bits para el índice = Número de líneas de caché / Tamaño de la línea de caché
-```
+#### Resumen de los campos de la dirección:
 
-```
-Número de bits para el índice = 1K / 64 bits
-```
+- **Etiqueta (Tag)**: 8 bits.
+- **Índice (Index)**: 4 bits.
+- **Offset de palabra (Word Offset)**: 2 bits.
+- **Offset de byte (Byte Offset)**: 1 bit.
 
-```
-Número de bits para el índice = 16
-```
+### b) ¿Cuántas líneas contiene la memoria caché?
 
-**Cálculo del número de bits para el desplazamiento:**
+Ya sabemos que la caché tiene un total de **1K bits** para datos, y cada línea tiene **64 bits** (4 palabras de 16 bits). Entonces:
 
-```
-Número de bits para el desplazamiento = Tamaño de la palabra / Tamaño del bloque de memoria
-```
+\[
+\frac{1024 \, \text{bits}}{64 \, \text{bits por línea}} = 16 \, \text{líneas}.
+\]
 
-```
-Número de bits para el desplazamiento = 16 bits / 64 bits/bloque
-```
+La caché contiene **16 líneas**.
 
-```
-Número de bits para el desplazamiento = 2
-```
+### c) ¿Cuántos bits hay en cada línea de la memoria caché y cómo se dividen según su función?
 
-**Formato de la dirección:**
+Cada línea de la memoria caché contiene los siguientes bits:
 
-```
-| Etiqueta (512 bits) | Índice (16 bits) | Desplazamiento (2 bits) |
-```
+#### 1. **Bits de datos**:
+Cada línea tiene **4 palabras** de **16 bits** cada una, por lo que hay:
+\[
+4 \, \text{palabras} \times 16 \, \text{bits} = 64 \, \text{bits de datos}.
+\]
 
-**Explicación:**
+#### 2. **Bits de control (Etiqueta)**:
+Cada línea debe almacenar una **etiqueta (Tag)** para identificar a qué bloque de la memoria principal corresponde. Ya calculamos que la **etiqueta** tiene **8 bits**.
 
-* **La etiqueta:** identifica la línea de caché que contiene el bloque de memoria principal correspondiente.
-* **El índice:** identifica la línea de caché específica dentro de la caché.
-* **El desplazamiento:** identifica la palabra dentro del bloque de memoria principal.
+#### 3. **Bit de validez (Valid bit)**:
+Normalmente, en cachés con mapeo directo, se usa un **bit de validez** por línea para indicar si esa línea contiene datos válidos o no. Por lo tanto, cada línea necesita **1 bit de validez**.
 
-**Respuesta:**
+#### Resumen de bits por línea:
 
-El número de bits para los diferentes campos de la dirección es el siguiente:
+- **64 bits** para los datos.
+- **8 bits** para la etiqueta (Tag).
+- **1 bit** para el bit de validez.
 
-* **Etiqueta:** 512 bits
-* **Índice:** 16 bits
-* **Desplazamiento:** 2 bits
+Por lo tanto, cada línea tiene un total de:
+\[
+64 \, \text{bits (datos)} + 8 \, \text{bits (etiqueta)} + 1 \, \text{bit (validez)} = 73 \, \text{bits por línea}.
+\]
 
+---
 
+### Resumen final:
+- a) Los campos de la dirección de memoria principal son: **8 bits para la etiqueta**, **4 bits para el índice**, **2 bits para el offset de palabra**, y **1 bit para el offset de byte**.
+- b) La caché tiene **16 líneas**.
+- c) Cada línea de la caché tiene **73 bits**, de los cuales **64 bits son datos**, **8 bits son para la etiqueta**, y **1 bit es el de validez**.
 
-----------------------------------------------------------------------------------------------------------------------------
-
-
-b. **Cantidad de líneas en la memoria caché:**
-
-Tamaño de cada linea de la cache = palabras por linea x tamaño de palabra (en bits)
-				= 4x16 = 64 bits
-
-Numero de lineas en la cache = capacidad total de la cache/ tamaño de cada linea
-				= 1024/64 = 16 lineas
-				
-Por lo tanto tenemos 16 lineas.
-
-----------------------------------------------------------------------------------------------------------------------------
-
-c. **Cantidad de bits en cada línea de la memoria caché y cómo se dividen según su función:**
-
-Bits para datos: 64 bits
-Bits para el índice: 4 bits
-Bits para el desplazamiento: 6 bits
+Si tienes alguna duda adicional o necesitas más aclaraciones, ¡no dudes en preguntar!
 
 

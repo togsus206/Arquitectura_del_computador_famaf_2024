@@ -11,24 +11,44 @@ Magnetic disk 			    5000000- 20000000ns	    $0.05-$0.10
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
-La frecuencia de reloj en ciclos por segundo (Hz) es igual a 1.7 gigahertz (GHz), que es 1.7 × 10^9 ciclos por segundo. Para calcular el número de ciclos de reloj para cada tipo de memoria, simplemente multiplicaremos la frecuencia de reloj (ciclos por segundo) por el tiempo de acceso (en segundos) para obtener el número de ciclos.
+Necesitamos calcular cuántos ciclos de clock se requieren para acceder a las memorias SRAM (caché) y DRAM (memoria principal).
 
-Para SRAM (Semiconductor Memory):
+Primero, calculamos el tiempo de cada ciclo de clock del procesador:
 
-Tiempo de acceso típico: 0.5-2.5 ns (usaremos el valor mínimo para calcular el número mínimo de ciclos)
-Ciclos de reloj para SRAM = Tiempo de acceso (en segundos) * Frecuencia de reloj (en ciclos por segundo)
-Ciclos de reloj para SRAM = 0.5 ns * 1.7 × 10^9 ciclos por segundo
+### Procesador a 1.7 GHz:
+1. La frecuencia es de 1.7 GHz, es decir, 1.7 x 10⁹ ciclos por segundo.
+2. El periodo (o tiempo de un ciclo de clock) es el inverso de la frecuencia:
 
+tiempo de ciclo = 1 /(1.7 x 10⁹) = 0.588 ns
 
-Ciclos de reloj para SRAM = 0.5 ns * 1.7 × 10^9 ciclos por segundo ≈ 850 ciclos de reloj
+### Para la memoria SRAM (caché):
+- El tiempo de acceso está entre 0.5 ns y 2.5 ns.
+- Para obtener los ciclos de clock, dividimos el tiempo de acceso por el tiempo de un ciclo de clock:
 
-Para DRAM (Semiconductor Memory):
+  - Para 0.5 ns:
 
-Tiempo de acceso típico: 50-70 ns (usaremos el valor mínimo para calcular el número mínimo de ciclos)
-Ciclos de reloj para DRAM = Tiempo de acceso (en segundos) * Frecuencia de reloj (en ciclos por segundo)
-Ciclos de reloj para DRAM = 50 ns * 1.7 × 10^9 ciclos por segundo
-Ahora, vamos a calcular estos valores.
+		0.5 ns/ 0.588ns = 0.85 ciclos de reloj
 
-Ciclos de reloj para DRAM = 50 ns * 1.7 × 10^9 ciclos por segundo ≈ 85,000 ciclos de reloj
+  - Para 2.5 ns:
+  
+		2.5 ns/ 0.588ns = 4.25 ciclos de reloj
+  
+  Entonces, el acceso a la SRAM tarda entre **1 y 5 ciclos de clock** aproximadamente.
 
-Por lo tanto, leer un dato de la caché (SRAM) implica aproximadamente 850 ciclos de reloj, mientras que leer un dato de la memoria principal (DRAM) implica aproximadamente 85,000 ciclos de reloj en un procesador que trabaja a 1.7 GHz.
+### Para la memoria DRAM (memoria principal):
+- El tiempo de acceso está entre 50 ns y 70 ns.
+- Calculamos los ciclos de clock:
+  - Para 50 ns:
+    
+    50ns/ 0.588ns = 85 ciclos de reloj
+    
+  - Para 70 ns:
+    
+    70ns/ 0.588ns = 119 ciclos de reloj
+  
+  Entonces, el acceso a la DRAM tarda entre **85 y 119 ciclos de clock**.
+
+### Resumen:
+- **Caché (SRAM):** entre **1 y 4 ciclos de clock**.
+- **Memoria principal (DRAM):** entre **85 y 119 ciclos de clock**.
+

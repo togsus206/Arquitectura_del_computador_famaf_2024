@@ -23,101 +23,46 @@ instrucciones y datos (mismo Miss Rate), ¿cuál es el CPI total para ambos proc
 
 --------------------------------------------------------------------------------------------------------
 
-A)
 
-El tiempo de ciclo de un procesador es el tiempo que tarda en ejecutar una instrucción. En este caso, el tiempo de ciclo se determina por el tiempo de acceso a la caché L1.
+### a. Calcular la frecuencia de reloj (CLK)
 
-Procesador 1:
+El hit time de la caché L1 determina el tiempo de ciclo de ambos procesadores. La frecuencia de reloj es el inverso del tiempo de ciclo.
 
-El tiempo de ciclo del procesador 1 es de 0,66 ns.
+Para el Procesador 1 (P1), el hit time es de 0.66 ns, por lo que la frecuencia es 1 / 0.66 ns, que da aproximadamente 1.515 GHz.
 
-f = 1 / t_ciclo
-f = 1 / 0,66 ns
-f = 1,51 ns
+Para el Procesador 2 (P2), el hit time es de 0.9 ns, así que la frecuencia es 1 / 0.9 ns, que da aproximadamente 1.111 GHz.
 
-Procesador 2:
+---
 
-El tiempo de ciclo del procesador 2 es de 0,9 ns.
+### b. Calcular el AMAT (Tiempo de acceso promedio)
 
-f = 1 / t_ciclo
-f = 1 / 0,9 ns
-f = 1,11 ns
+El AMAT se calcula sumando el hit time más el producto del miss rate y la miss penalty (tiempo de acceso a la memoria principal). La miss penalty es 70 ns para ambos procesadores.
 
+Para el Procesador 1 (P1), el hit time es 0.66 ns, el miss rate es 8% (o 0.08), y la miss penalty es 70 ns. Entonces, AMAT = 0.66 ns + (0.08 * 70 ns) = 6.26 ns.
 
+Para el Procesador 2 (P2), el hit time es 0.9 ns, el miss rate es 6% (o 0.06), y la miss penalty es 70 ns. Entonces, AMAT = 0.9 ns + (0.06 * 70 ns) = 5.1 ns.
 
+---
 
------------------------------------------------------------------------------------------------------------
+### c. Calcular el CPI total
 
+El CPI total se calcula sumando el CPI base (que es 1) más el producto del miss rate, la penalidad por miss y la frecuencia de acceso a memoria. La frecuencia de acceso a memoria es 36% (o 0.36).
 
+Para el Procesador 1 (P1), el miss rate es 8% (o 0.08), la penalidad por miss es 70 ns, y la frecuencia de acceso a memoria es 36%. Entonces, el CPI total es 1 + (0.08 * 70 ns * 0.36) = 3.016.
 
-B)
+Para el Procesador 2 (P2), el miss rate es 6% (o 0.06), la penalidad por miss es 70 ns, y la frecuencia de acceso a memoria es 36%. Entonces, el CPI total es 1 + (0.06 * 70 ns * 0.36) = 2.512.
 
+---
 
-El Average Memory Access Time (AMAT) se puede calcular utilizando la siguiente fórmula:
+### ¿Cuál procesador es más rápido?
 
- AMAT = Hit Time + Miss_Rate x Miss_Penalty
+Para determinar cuál procesador es más rápido, comparamos la relación entre la frecuencia de reloj y el CPI total.
 
-Donde:
-- Hit Time es el tiempo que lleva acceder a la caché en caso de acierto (proporcionado en la tabla).
-- Miss Rate es la tasa de fallos en la caché (proporcionada en la tabla).
-- Miss Penalty es el tiempo adicional que se tarda cuando hay un fallo de caché, y se puede calcular utilizando el tiempo de acceso a la memoria principal (Main Memory Access Time).
+Para el Procesador 1 (P1), su rendimiento es 1.515 GHz / 3.016, que da aproximadamente 0.502 GHz.
 
-Para el Procesador 1:
-	Miss_Penalty_P1 = 70 ns - 0.66 ns = 69.34 ns
+Para el Procesador 2 (P2), su rendimiento es 1.111 GHz / 2.512, que da aproximadamente 0.442 GHz.
 
-	AMAT_{P1} = 0.66 ns + 0.08 x 69.34 ns = 5.6232 ns
-
-
-
-Para el Procesador 2:
-	Miss_Penalty_P2 = 70 ns - 0.9 ns = 69.1 ns
-
-	AMAT_{P2} = 0.9 ns + 0.06 x 69.1 ns = 4.544 ns
-
------------------------------------------------------------------------------------------------------------------------
-
-
-C)
-
-
-**Solución:**
-
-El CPI total de un procesador es la suma del CPI de las instrucciones y el CPI de los datos.
-
-En este caso, el CPI de las instrucciones es de 1.
-
-El CPI de los datos es igual al AMAT.
-
-**Procesador 1:**
-
-El CPI total del procesador 1 es de 6,18 ns.
-
-```
-CPI_total = CPI_instrucciones + CPI_datos
-CPI_total = 1 + 6,18 ns
-CPI_total = 7,18 ns
-```
-
-**Procesador 2:**
-
-El CPI total del procesador 2 es de 5,05 ns.
-
-```
-CPI_total = CPI_instrucciones + CPI_datos
-CPI_total = 1 + 5,05 ns
-CPI_total = 6,05 ns
-```
-
-**Respuesta:**
-
-El CPI total del procesador 2 es de 6,05 ns, que es menor que el CPI total del procesador 1, que es de 7,18 ns. Por lo tanto, el procesador 2 es más rápido que el procesador 1.
-
-**Explicación:**
-
-El procesador 2 tiene un CPI total menor que el procesador 1 porque tiene un AMAT menor. Esto se debe a que tiene una tasa de fallos de caché más baja.
-
-En resumen, el procesador 2 es más rápido que el procesador 1 porque tiene un CPI total menor.
-
+Por lo tanto, a pesar de tener un CPI total mayor, el P1 es un poco más rápido que el P2 debido a su mayor frecuencia de reloj.
 
 
 
