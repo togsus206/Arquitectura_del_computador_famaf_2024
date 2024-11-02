@@ -1,0 +1,22 @@
+
+main.elf:     file format elf64-littleaarch64
+
+
+Disassembly of section .text:
+
+0000000000000000 <multloop-0xc>:
+   0:	8b1f03e2 	add	x2, xzr, xzr
+   4:	8b1f03e0 	add	x0, xzr, xzr
+   8:	8b1003fd 	add	x29, xzr, x16
+
+000000000000000c <multloop>:
+   c:	8b110042 	add	x2, x2, x17
+  10:	cb0103bd 	sub	x29, x29, x1
+  14:	b400005d 	cbz	x29, 1c <endloop>
+  18:	b4ffffbf 	cbz	xzr, c <multloop>
+
+000000000000001c <endloop>:
+  1c:	f8000002 	stur	x2, [x0]
+
+0000000000000020 <infloop>:
+  20:	b400001f 	cbz	xzr, 20 <infloop>

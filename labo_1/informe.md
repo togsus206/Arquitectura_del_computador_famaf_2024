@@ -38,9 +38,3 @@ Con estos cambios, el procesador ahora puede ejecutar la instrucción MOVZ de la
 3. El resultado de la operación ALU se calcula en la etapa EX.
 4. Si la señal `zero_E` es 1, se establece la señal `writeData_E` en el valor del registro 3.
 5. El valor del registro 3 se escribe en el registro de destino en la etapa MEM.
-
-Este comportamiento es consistente con la definición de la instrucción MOVZ.
-
-Espero que este informe sea de tu ayuda.
-
-¿Hay algo más que pueda ayudarte?
